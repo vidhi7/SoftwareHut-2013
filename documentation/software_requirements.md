@@ -64,7 +64,7 @@ The scope of the project is understanding technologies such as JavaCard,Kannel,W
 ####2.	Overall Description
 #####2.1	Product Perspective
 Diagram of project's major components<br/>
-![](http://postimage.org/image/e6rbz5ncx/)
+![](http://s3.postimage.org/aqet311ab/Drawing1.jpg)
 #####2.2	Product Features
 The product sole feature is to display a message when requested.
 #####2.3	User Classes and Characteristics
