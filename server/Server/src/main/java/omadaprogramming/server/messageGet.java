@@ -29,8 +29,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 /**
- *
- * @author alex
+ * Uses the message pulled from database by PullQuote and posts it over
+ * @author Brasoveanu Andrei Alexandru
  */
 public class messageGet extends HttpServlet {
 
