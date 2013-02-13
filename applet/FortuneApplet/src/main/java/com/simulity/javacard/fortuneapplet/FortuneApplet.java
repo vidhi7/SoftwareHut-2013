@@ -31,6 +31,7 @@ import javacard.framework.ISO7816;
 import javacard.framework.ISOException;
 import javacard.framework.JCSystem;
 import sim.toolkit.EnvelopeHandler;
+import sim.toolkit.ProactiveHandler;
 import sim.toolkit.ToolkitConstants;
 import sim.toolkit.ToolkitInterface;
 import sim.toolkit.ToolkitRegistry;
@@ -122,19 +123,19 @@ public class FortuneApplet extends Applet implements ToolkitConstants, ToolkitIn
                         // If our message is: Hello, World!
                         //
                         // And our Tag is 0xF0
-                        // 
-                        // Then our incoming payload should be: 
+                        //
+                        // Then our incoming payload should be:
                         // 
                         // F0 0C 48 65 6C 6C 6F 2C 20 57 6F 72 6C 64 21
-                        // 
-                        // Copy the message into some sort of buffer... 
-                        // 
-                        // to do this you'll need to process this data... 
-                        // 
+                        //
+                        // Copy the message into some sort of buffer...
+                        //
+                        // to do this you'll need to process this data...
+                        //
                         // apduBuffer = { 0A, 0x02, 0x00, 0x00, 0x0E, F0, 0C, 
                         // 48, 65, 6C, 6C, 6F, 2C, 20, 57, 6F, 72, 6C, 64, 21 }
-                        // 
-                        // 
+                        //
+                        //
                         // 1. Get the length of the payload data... 
                         // Clue: OFFSET_LC
                         //
@@ -149,12 +150,17 @@ public class FortuneApplet extends Applet implements ToolkitConstants, ToolkitIn
                         //      on the data to retrieve the actual message. 
                         //
                         // 5. You will then have 'Hello, World!' inside a separate
-                        //      buffer. 
+                        //      buffer.
                         // 
                         // 6. You will then be prepared to display this message
                         //      on the handset to the end user. This comes
                         //      next week. ^_^
-                        
+                        ProactiveHandler theHandler = ProactiveHandler.getTheHandler();
+                        theHandler.initDisplayText((byte) 0x00, DCS_8_BIT_DATA, new byte[] { (char) 'H', (char) 'i' }, (short) 0, (short) 2);
+                        byte send = theHandler.send();
+                        if(send != RES_CMD_PERF) {
+                            // some error
+                        }
                     }
                 }
             }
