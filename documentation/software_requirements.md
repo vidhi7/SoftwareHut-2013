@@ -35,7 +35,26 @@ Appendix A: Glossary
 Appendix B: Analysis Models	
 Appendix C: Issues List	
 
+purpose: provide value and services for users without smartphones. for demographics without access.
 
+conventions: include abbreviations, jargon, document stylings (code)
+
+intended : people who know development methodologies
+
+scope: create complete solution running on java
+
+references: 
+performance requirement: how many users targeted?
+security requirements: a lot to talk about. will be provided.
+
+project perspective: (diagram)
+
+user interfaces: ui on the applet side (bottom of diagram). 
+hardware: conversion from SMS protocol to IP protocol. conversion from APDU's to requests.
+testing: unit testing for applet, servlet.
+will be testing on a cluster of servers.
+live testing, penetration testing.
+is the code crackable etc.
 
 
 #### 1. Introduction
