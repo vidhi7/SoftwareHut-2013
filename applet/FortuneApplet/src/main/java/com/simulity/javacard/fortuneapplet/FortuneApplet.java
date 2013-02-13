@@ -27,6 +27,7 @@ package com.simulity.javacard.fortuneapplet;
 
 import javacard.framework.APDU;
 import javacard.framework.Applet;
+import javacard.framework.ISO7816;
 import javacard.framework.ISOException;
 import javacard.framework.JCSystem;
 import sim.toolkit.EnvelopeHandler;
@@ -38,7 +39,7 @@ import sim.toolkit.ToolkitRegistry;
  *
  * @author Christopher Burke <christopher.burke@simulity.com>
  */
-public class FortuneApplet extends Applet implements ToolkitConstants, ToolkitInterface {
+public class FortuneApplet extends Applet implements ToolkitConstants, ToolkitInterface, ISO7816 {
 
     private ToolkitRegistry toolkitRegistry = ToolkitRegistry.getEntry();
     private byte[] swap;
@@ -93,23 +94,80 @@ public class FortuneApplet extends Applet implements ToolkitConstants, ToolkitIn
     }
 
     public void process(APDU apdu) throws ISOException {
-        byte[] buffer = apdu.getBuffer();
-        short setIncomingAndReceive = apdu.setIncomingAndReceive();
-        process(buffer);
+        apdu.setIncomingAndReceive();
+        process(apdu.getBuffer());
     }
 
-    public void process(byte[] apduBuffer) {
+    public void process(byte[] apduBuffer) throws ISOException {
         if (!selectingApplet()) {
-            // we've recieved in incoming request from the SMSC/GW
-            // to process a fortune message.
+            if(apduBuffer[OFFSET_CLA] != CLA) {
+                throw new ISOException(SW_CLA_NOT_SUPPORTED);
+            } else {
+                if(apduBuffer[OFFSET_INS] != INS_INCOMING) {
+                    throw new ISOException(SW_INS_NOT_SUPPORTED);
+                } else {
+                    if((apduBuffer[OFFSET_P1] != P1) && apduBuffer[OFFSET_P2] != P2) {
+                        throw new ISOException(SW_INCORRECT_P1P2);
+                    } else {
+                        // we've validated the header data, let's check the payload
+                        // the apduBuffer should look something like this....
+                        // 0x0A, 0x02, 0x00, 0x00, 0x0E,
+                        // ^CLA, ^INS, ^^P1, ^^P2, ^^LE
+                        // 
+                        // BEGIN TLVS....
+                        // TAG_MESSAGE_DATA
+                        // LEN_MESSAGE_DATA
+                        // MESSAGE_DATA
+                        // 
+                        // If our message is: Hello, World!
+                        //
+                        // And our Tag is 0xF0
+                        // 
+                        // Then our incoming payload should be: 
+                        // 
+                        // F0 0C 48 65 6C 6C 6F 2C 20 57 6F 72 6C 64 21
+                        // 
+                        // Copy the message into some sort of buffer... 
+                        // 
+                        // to do this you'll need to process this data... 
+                        // 
+                        // apduBuffer = { 0A, 0x02, 0x00, 0x00, 0x0E, F0, 0C, 
+                        // 48, 65, 6C, 6C, 6F, 2C, 20, 57, 6F, 72, 6C, 64, 21 }
+                        // 
+                        // 
+                        // 1. Get the length of the payload data... 
+                        // Clue: OFFSET_LC
+                        //
+                        // 2. Validate that the tag for the payload data is 
+                        //      correct, in this example above the tag is 0xF0
+                        // 
+                        // 3. If the payload tag is correct, retrieve the
+                        //      length of the meaningful data... i.e. go one
+                        //      past the tag byte to get the length byte
+                        //
+                        // 4. Use the length byte to invoke Util.arrayCopy
+                        //      on the data to retrieve the actual message. 
+                        //
+                        // 5. You will then have 'Hello, World!' inside a separate
+                        //      buffer. 
+                        // 
+                        // 6. You will then be prepared to display this message
+                        //      on the handset to the end user. This comes
+                        //      next week. ^_^
+                        
+                    }
+                }
+            }
+            
         }
     }
 
     public void processToolkit(byte event) {
         switch (event) {
             case EVENT_MENU_SELECTION:
-                // We now need to transmit and SMS to the server to request
-                // a fortune message
+                // TODO: Convert data from 8-bit ASCII to GSM-7 bit
+                // TODO: Create a sendSms method which can transmit an 
+                // SMS
                 break;
             case EVENT_FORMATTED_SMS_PP_ENV:
                 EnvelopeHandler envelopeHandler = EnvelopeHandler.getTheHandler();
@@ -124,4 +182,34 @@ public class FortuneApplet extends Applet implements ToolkitConstants, ToolkitIn
                 break;
         }
     }
+    
+//    /**
+//     * Converts an 8Bit message to GSM7 bit ASCII encoding
+//     *
+//     * http://en.wikipedia.org/wiki/GSM_03.38
+//     *
+//     * @param byaSrc 8bit byte array of data to convert
+//     * @return 7bit GSM7 encoded 
+//     */
+//    public static Byte[] conv8bitToGsm7(byte[] byaSrc) {
+//
+//        List<Byte> dstByaList = new ArrayList<Byte>();
+//        byte buf = (byte) 0x00;
+//
+//        for (int i = 0; i < byaSrc.length; i++) {
+//            byte b = byaSrc[i];
+//            byte c = (byte) (i & 7);
+//            if (c == 0) {
+//                buf = b;
+//            } else {
+//                dstByaList.add((byte) ((b << (8 - c) | buf)));
+//                buf = (byte) (b >> c);
+//            }
+//        }
+//
+//        if ((byaSrc.length % 8) != 0) {
+//            dstByaList.add(buf);
+//        }
+//        return dstByaList.toArray(new Byte[dstByaList.size()]);
+//    }
 }
