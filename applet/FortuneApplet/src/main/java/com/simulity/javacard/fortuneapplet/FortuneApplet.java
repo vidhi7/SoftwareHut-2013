@@ -28,6 +28,8 @@ package com.simulity.javacard.fortuneapplet;
 import javacard.framework.APDU;
 import javacard.framework.Applet;
 import javacard.framework.ISOException;
+import javacard.framework.JCSystem;
+import sim.toolkit.EnvelopeHandler;
 import sim.toolkit.ToolkitConstants;
 import sim.toolkit.ToolkitInterface;
 import sim.toolkit.ToolkitRegistry;
@@ -39,10 +41,30 @@ import sim.toolkit.ToolkitRegistry;
 public class FortuneApplet extends Applet implements ToolkitConstants, ToolkitInterface {
 
     private ToolkitRegistry toolkitRegistry = ToolkitRegistry.getEntry();
-    
+    private byte[] swap;
+    private byte CLA = (byte) 0x0A;
+    private byte INS_INCOMING = (byte) 0x01;
+    private byte INS_OUTGOING = (byte) 0x02;
+    private byte P1 = (byte) 0x00;
+    private byte P2 = (byte) 0x00;
+    private byte[] MENU_ENTRY = new byte[]{
+        (char) 'F', (char) 'o', (char) 'r', (char) 't', 
+        (char) 'u', (char) 'n', (char) 'e'
+    };
+
     public FortuneApplet(byte[] bArray, short bOffset, short parametersLength) {
         // Get the reference of the applet ToolkitRegistry object
         toolkitRegistry = ToolkitRegistry.getEntry();
+
+        toolkitRegistry.setEvent(EVENT_FORMATTED_SMS_PP_ENV);
+
+        this.swap = JCSystem.makeTransientByteArray((short) 250, JCSystem.CLEAR_ON_RESET);
+
+        toolkitRegistry.initMenuEntry(
+                MENU_ENTRY, 
+                (short) 0, // offset in array 
+                (short) 7, // length of 'Fortune'
+                PRO_CMD_SELECT_ITEM, false, (byte) 0, (short) 0);
 
     }
 
@@ -69,20 +91,37 @@ public class FortuneApplet extends Applet implements ToolkitConstants, ToolkitIn
                 .register(bArray, (short) (bOffset + 1), bArray[bOffset]);
 
     }
-    
-    @Override
+
     public void process(APDU apdu) throws ISOException {
         byte[] buffer = apdu.getBuffer();
         short setIncomingAndReceive = apdu.setIncomingAndReceive();
         process(buffer);
     }
-    
-    public void process(byte[] apduBuffer) { 
-        // main applet logic
+
+    public void process(byte[] apduBuffer) {
+        if (!selectingApplet()) {
+            // we've recieved in incoming request from the SMSC/GW
+            // to process a fortune message.
+        }
     }
 
-    public void processToolkit(byte b) {
-        
+    public void processToolkit(byte event) {
+        switch (event) {
+            case EVENT_MENU_SELECTION:
+                // We now need to transmit and SMS to the server to request
+                // a fortune message
+                break;
+            case EVENT_FORMATTED_SMS_PP_ENV:
+                EnvelopeHandler envelopeHandler = EnvelopeHandler.getTheHandler();
+
+                short securedDataLength = envelopeHandler.getSecuredDataLength();
+                short securedDataOffset = envelopeHandler.getSecuredDataOffset();
+
+                envelopeHandler.copyValue(securedDataOffset, swap, (short) 0, securedDataLength);
+
+                process(swap);
+
+                break;
+        }
     }
-    
 }
