@@ -60,7 +60,7 @@ is the code crackable etc.
 #### 1. Introduction
 #####1.1 Purpose
 Developing a simple 'fortune 
-cookie' (cf. unix 'fortune') application which is to be deployed with JavaCard technology.
+cookie' (cf. unix 'fortune') application which is to be deployed with JavaCard technology.This can provide value services for users without smart phones or demographics in which access to that technology is not available. 
 
 From Wikipedia: fortune is a simple program that displays a pseudo random message from a database of quotations that first appeared in Version 7 Unix.
 #####1.2 Document Conventions
@@ -74,7 +74,7 @@ MSISDN : Mobile Subscriber Integrated Services Digital Network-Number<br>
 SMSC : short message service center<br>
 SMSGW : SMS Gateway
 #####1.3	Intended Audience and Reading Suggestions
-The document is intended for readers involved in the project directly or indirectly. The technical value of the document is intended for someone with knowledge of programming and networking 
+The document is intended for readers involved in the project directly or indirectly. The technical value of the document is intended for someone with knowledge of development methodologies in programming and networking. 
 #####1.4	Project Scope
 The scope of the project is understanding technologies such as JavaCard,Kannel,WAP,HTTP.
 #####1.5	References
@@ -83,7 +83,7 @@ The scope of the project is understanding technologies such as JavaCard,Kannel,W
 ####2.	Overall Description
 #####2.1	Product Perspective
 Diagram of project's major components<br/>
-![](http://s3.postimage.org/aqet311ab/Drawing1.jpg)
+![](http://s7.postimage.org/h1u6cld23/Application_Graph.jpg)
 #####2.2	Product Features
 The product sole feature is to display a message when requested.
 #####2.3	User Classes and Characteristics
