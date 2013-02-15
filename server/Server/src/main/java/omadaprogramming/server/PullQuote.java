@@ -49,9 +49,9 @@ public class PullQuote {
         DataSource.init(in);
         Connection conn = DataSource.getConnection();
         stat = conn.createStatement();
-        Random generator = new Random();
-        int id = 1 + generator.nextInt(10);
-        ResultSet result = stat.executeQuery("SELECT * FROM Quotes WHERE Quote_ID ='" + id + "'");
+        //Random generator = new Random();
+        //int id = 1 + generator.nextInt(10);
+        ResultSet result = stat.executeQuery("SELECT Quote FROM Quotes ORDER BY RAND() LIMIT 1");
         String message = "Quote:";
         while (result.next()) {
 

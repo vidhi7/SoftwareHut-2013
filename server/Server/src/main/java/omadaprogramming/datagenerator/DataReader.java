@@ -57,31 +57,20 @@ public class DataReader {
             bufferReader.close();
 
             //Uses the default % to split the messages in the database
+            //Alsoo changes all " with ''
             StringBuffer commands = new StringBuffer(buffer.toString().replaceAll("\"", "''"));            
-            String[] split = commands.toString().split("%");
-            
-            //Get the id of last entry
-            int lastID = 0;
-            ResultSet rs = stat.executeQuery("SELECT * FROM Quotes");
-            while(rs.next()){
-                lastID = rs.getInt(1);
-            }
-                       
-            
-            
-            
-            //Execute command
-            int id = lastID + 1;
+            String[] split = commands.toString().split("%");        
+
+            //Execute command            
             
             String sql = "INSERT INTO Quotes VALUE (";
             String m = "\"";
             System.out.println(split.length);
             for (int i = 0; i < split.length; i++) {
-                if (!split[i].trim().equals("")) {
-                    //stat.execute("DELETE FROM Quotes WHERE Quote_ID = '13'");
-                    stat.executeUpdate(sql + m + id + m + "," + m + split[i] + m + ");");
-                    System.out.println("Trying::>" + sql + m + id + m + "," + m + split[i] + m + ");");
-                    id++;
+                if (!split[i].trim().equals("")) {                    
+                    stat.executeUpdate(sql + m + split[i] + m + ");");
+                    System.out.println("Trying::>" + sql + m + split[i] + m + ");");
+                    
                     
                 }
             }
