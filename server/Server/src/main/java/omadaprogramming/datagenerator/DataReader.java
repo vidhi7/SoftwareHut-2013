@@ -29,9 +29,9 @@ import omadaprogramming.server.DataSource;
 import omadaprogramming.server.PullQuote;
 
 /**
- *This class uses default fortune data files
- * It parses them and turn each message into a
- * SQL statement that is executed afterwards
+ * This class uses default fortune data files It parses them and turn each
+ * message into a SQL statement that is executed afterwards
+ *
  * @author Brasoveanu Andrei Alexandru
  */
 public class DataReader {
@@ -40,7 +40,7 @@ public class DataReader {
         String command = new String();
         StringBuffer buffer = new StringBuffer();
         InputStream in = DataReader.class.getResourceAsStream("/database.properties");
-        
+
         try {
 
             //Conects too database
@@ -58,27 +58,30 @@ public class DataReader {
 
             //Uses the default % to split the messages in the database
             //Alsoo changes all " with ''
-            StringBuffer commands = new StringBuffer(buffer.toString().replaceAll("\"", "''"));            
-            String[] split = commands.toString().split("%");        
+            StringBuffer commands = new StringBuffer(buffer.toString().replaceAll("\"", "''"));
+            String[] split = commands.toString().split("%");
 
             //Execute command            
-            
-            String sql = "INSERT INTO Quotes VALUE (";
+
+            String sql = "INSERT INTO Quotes (Quote) VALUE (";
             String m = "\"";
             System.out.println(split.length);
             for (int i = 0; i < split.length; i++) {
-                if (!split[i].trim().equals("")) {                    
-                    stat.executeUpdate(sql + m + split[i] + m + ");");
+                if (!split[i].trim().equals("")) {
+                    //stat.executeUpdate(sql + m + split[i] + m + ");");
                     System.out.println("Trying::>" + sql + m + split[i] + m + ");");
-                    
-                    
+
+
                 }
             }
+            stat.execute("CREATE TABLE Quotes_deduped like Quotes;");
+            stat.execute("INSERT Quotes_deduped SELECT * FROM QUotes GROUP BY Quote;");
+            stat.execute("RENAME TABLE Quotes TO Quotes_with_dupes;");
+            stat.execute("RENAME TABLE Quotes_deduped TO Quotes;");
+            stat.execute("DROP TABLE Quotes_with_dupes;");
 
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
-    
-    
 }

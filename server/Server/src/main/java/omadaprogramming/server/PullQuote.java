@@ -28,6 +28,7 @@ import java.util.Random;
 
 /**
  * Pulls a quote out of database and return it as string
+ *
  * @author Brasoveanu Andrei Alexandu
  */
 public class PullQuote {
@@ -35,7 +36,6 @@ public class PullQuote {
     //Create connection
     private static Statement stat;
 
-    
     /**
      *
      * @return message A quote from database
@@ -45,7 +45,7 @@ public class PullQuote {
      */
     public static String getQuote() throws ClassNotFoundException, IOException, SQLException {
         InputStream in = PullQuote.class.getResourceAsStream("/database.properties");
-        
+
         DataSource.init(in);
         Connection conn = DataSource.getConnection();
         stat = conn.createStatement();
@@ -55,9 +55,9 @@ public class PullQuote {
         String message = "Quote:";
         while (result.next()) {
 
-            message += "\n" +  result.getString("Quote");
-                    
-        }        
+            message += "\n" + result.getString("Quote");
+
+        }
         return message;
 
     }
