@@ -23,21 +23,26 @@
  * @ Brasoveanu Andrei Alexandru
  */
 
-// Sets the modules used
+// Gets modules used
 var http = require('http'),
 httpProxy = require('http-proxy');
 
-//List of potential servers to farward data to
- var servers =  [{host :'ip_server_1', port :9991}, {host : 'ip_server_1',port :9992}];
+//This is the list of servers to farward data to
+var servers =  [{
+    host :'ip_server_1', 
+    port :9991
+}, {
+    host : 'ip_server_1',
+    port :9992
+}, {
+    host: 'ip_server_3',
+    port: 9991
+}];
 
-//Create a stand alone proxy server 
-  httpProxy.createServer(function (req, res, proxy) {
-
-//Sends data to potential servers in a round robin manner
-  var target = servers.shift();
-  proxy.proxyRequest(req, res, target);
-  servers.push(target);
-
-//The port it listens for data
-   }).listen(9999);
+//Shuffles data between the servers in the list
+httpProxy.createServer(function (req, res, proxy) {
+    var target = servers.shift();
+    proxy.proxyRequest(req, res, target);
+    servers.push(target);
+}).listen(9999, 'ip_addres_of_kannel');//Listens to ip and port ...
 
