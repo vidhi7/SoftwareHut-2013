@@ -30,6 +30,7 @@ import javacard.framework.Applet;
 import javacard.framework.ISO7816;
 import javacard.framework.ISOException;
 import javacard.framework.JCSystem;
+import javacard.framework.Util;
 import sim.toolkit.EnvelopeHandler;
 import sim.toolkit.ProactiveHandler;
 import sim.toolkit.ToolkitConstants;
@@ -53,6 +54,8 @@ public class FortuneApplet extends Applet implements ToolkitConstants, ToolkitIn
         (char) 'F', (char) 'o', (char) 'r', (char) 't', 
         (char) 'u', (char) 'n', (char) 'e'
     };
+    private byte msgLength;
+    private byte[] msgBuffer;
 
     public FortuneApplet(byte[] bArray, short bOffset, short parametersLength) {
         // Get the reference of the applet ToolkitRegistry object
@@ -155,6 +158,22 @@ public class FortuneApplet extends Applet implements ToolkitConstants, ToolkitIn
                         // 6. You will then be prepared to display this message
                         //      on the handset to the end user. This comes
                         //      next week. ^_^
+                        /*      Trial implementation of the above   */
+                        
+                        short payloadLength = apduBuffer[OFFSET_LC];
+                        if (apduBuffer[OFFSET_CDATA]!=(byte) 0xF0){
+                            throw new ISOException(SW_CONDITIONS_NOT_SATISFIED);
+                        } else {
+                            msgLength = apduBuffer[OFFSET_CDATA+1];
+                            Util.arrayCopy(apduBuffer, msgLength, msgBuffer, (short) 0, payloadLength);
+                            /*  To test whether the above code is working
+                             * Not implemented yet because of pending issue.
+                             * Refer to GitHub
+                             */
+                            System.out.println(msgBuffer.toString());
+                        }
+                        
+                        
                         ProactiveHandler theHandler = ProactiveHandler.getTheHandler();
                         theHandler.initDisplayText((byte) 0x00, DCS_8_BIT_DATA, new byte[] { (char) 'H', (char) 'i' }, (short) 0, (short) 2);
                         byte send = theHandler.send();
