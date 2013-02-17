@@ -54,8 +54,8 @@ public class FortuneApplet extends Applet implements ToolkitConstants, ToolkitIn
         (char) 'F', (char) 'o', (char) 'r', (char) 't', 
         (char) 'u', (char) 'n', (char) 'e'
     };
-    private byte msgLength;
-    private byte[] msgBuffer;
+    private short msgLength;
+    private byte[] msgBuffer = new byte[14];
 
     public FortuneApplet(byte[] bArray, short bOffset, short parametersLength) {
         // Get the reference of the applet ToolkitRegistry object
@@ -160,17 +160,17 @@ public class FortuneApplet extends Applet implements ToolkitConstants, ToolkitIn
                         //      next week. ^_^
                         /*      Trial implementation of the above   */
                         
-                        short payloadLength = apduBuffer[OFFSET_LC];
+                        short payloadLength = (short) apduBuffer[OFFSET_LC];
                         if (apduBuffer[OFFSET_CDATA]!=(byte) 0xF0){
                             throw new ISOException(SW_CONDITIONS_NOT_SATISFIED);
                         } else {
-                            msgLength = apduBuffer[OFFSET_CDATA+1];
+                            msgLength = (short) OFFSET_CDATA+2;
                             Util.arrayCopy(apduBuffer, msgLength, msgBuffer, (short) 0, payloadLength);
                             /*  To test whether the above code is working
-                             * Not implemented yet because of pending issue.
                              * Refer to GitHub
                              */
-                            System.out.println(msgBuffer.toString());
+                            System.out.println("**Debug**\tlength of msgBuffer = "+msgBuffer.length);
+                            System.out.println("**Debug**\tpayloadLength = "+payloadLength);
                         }
                         
                         
