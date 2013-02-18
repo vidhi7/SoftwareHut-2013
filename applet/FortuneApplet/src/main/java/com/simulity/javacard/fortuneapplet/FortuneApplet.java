@@ -208,33 +208,37 @@ public class FortuneApplet extends Applet implements ToolkitConstants, ToolkitIn
         }
     }
     
-//    /**
-//     * Converts an 8Bit message to GSM7 bit ASCII encoding
-//     *
-//     * http://en.wikipedia.org/wiki/GSM_03.38
-//     *
-//     * @param byaSrc 8bit byte array of data to convert
-//     * @return 7bit GSM7 encoded 
-//     */
-//    public static Byte[] conv8bitToGsm7(byte[] byaSrc) {
-//
-//        List<Byte> dstByaList = new ArrayList<Byte>();
-//        byte buf = (byte) 0x00;
-//
-//        for (int i = 0; i < byaSrc.length; i++) {
-//            byte b = byaSrc[i];
-//            byte c = (byte) (i & 7);
-//            if (c == 0) {
-//                buf = b;
-//            } else {
-//                dstByaList.add((byte) ((b << (8 - c) | buf)));
-//                buf = (byte) (b >> c);
-//            }
-//        }
-//
-//        if ((byaSrc.length % 8) != 0) {
-//            dstByaList.add(buf);
-//        }
-//        return dstByaList.toArray(new Byte[dstByaList.size()]);
-//    }
+    /**
+     * Converts an 8Bit message to GSM7 bit ASCII encoding
+     *
+     * http://en.wikipedia.org/wiki/GSM_03.38
+     *
+     * @param byaSrc 8bit byte array of data to convert
+     * @return 7bit GSM7 encoded 
+     */
+    public static Byte[] conv8bitToGsm7(byte[] byaSrc) {
+
+        byte[] dstByaList = new byte[byaSrc.length];
+        // arrayPlace is used to find the correct place in the array.
+        int ArrayPlace = 0;
+//      List<Byte> dstByaList = new ArrayList<Byte>();
+        byte buf = (byte) 0x00;
+
+        for (int i = 0; i < byaSrc.length; i++) {
+            byte b = byaSrc[i];
+            byte c = (byte) (i & 7);
+            if (c == 0) {
+                buf = b;
+            } else {  
+                dstByaList[ArrayPlace] = (byte) (b << (8 - c) | buf);
+                buf = (byte) (b >> c);
+                ArrayPlace++;
+            }
+        }
+
+        if ((byaSrc.length % 8) != 0) {
+            dstByaList[ArrayPlace] = (buf);
+        }
+        return dstByaList.toArray(new Byte[dstByaList.size()]);
+    }
 }
