@@ -209,6 +209,34 @@ public class FortuneApplet extends Applet implements ToolkitConstants, ToolkitIn
     }
     
     /**
+     * @author: Christopher Burke
+     * 
+     * This is a method stub, for the 8bit to gsm7 
+     * compression algorithm. I have psuedo coded the functionality
+     * to assist with understanding. 
+     */
+     static byte[] swapBuffer = new byte[255];  // This is illegal syntax in JavaCard, and has only
+                                                // been included for illustration purposes
+     public static short conv8bitToGsm7(byte[] src, short srcOff, byte[] dst, short dstOff, short len) {
+         byte buf = (byte) 0x00;
+         for(short i = srcOff; i < (short) (srcOff + len); i++) {
+             byte b = src[i];
+             byte c = (byte) (i & 7);
+             if(c == 0) {
+                 buf = b;
+             } else {
+                 dst[dstOff++] = (byte) (short) ((b << ((short) (8 - c)) | buf) & 0xFF);
+                 buf = (byte) (b >> c);
+             }
+         }
+         
+         // TODO: Final Byte
+         
+         return dstOff;
+     }
+    
+    
+    /**
      * Converts an 8Bit message to GSM7 bit ASCII encoding
      *
      * http://en.wikipedia.org/wiki/GSM_03.38
