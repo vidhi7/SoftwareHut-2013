@@ -1,25 +1,30 @@
 # Software Requirements
 ###for JavaCard Development Simulity
 Version 1.0
+Team OmadaProgramming(Team 15)
+Members:
+Brasoveanu Andrei Alexandru
+Delvin Varghese
+Dominic Lee
+Konstantinos Akrivos
+
 
 ####Table of Contents
 1.  Introduction	
-	1.1	Purpose	
+	1.1	Purpose<br>	
 	1.2	Document Conventions	
 	1.3	Intended Audience and Reading Suggestions	
 	1.4	Project Scope	
 	1.5	References	
-2.	Overall Description	
-	2.1	Product Perspective	
+2.	Overall Description<br>	
+	2.1	Product Perspective<br>
 	2.2	Product Features	
 	2.3	User Classes and Characteristics	
 	2.4	Operating Environment	
 	2.5	Design and Implementation Constraints	
 	2.6	User Documentation	
 	2.7	Assumptions and Dependencies	
-3.	System Features	<br>
-	3.1	System Feature 
-	3.2 System Feature	
+3.	System Features	<br>	
 4.	External Interface Requirements<br>	
 	4.1	User Interfaces<br>	
 	4.2	Hardware Interfaces	<br>
@@ -34,28 +39,6 @@ Version 1.0
 Appendix A: Glossary	
 Appendix B: Analysis Models	
 Appendix C: Issues List	
-
-purpose: provide value and services for users without smartphones. for demographics without access.
-
-conventions: include abbreviations, jargon, document stylings (code)
-
-intended : people who know development methodologies
-
-scope: create complete solution running on java
-
-references: 
-performance requirement: how many users targeted?
-security requirements: a lot to talk about. will be provided.
-
-project perspective: (diagram)
-
-user interfaces: ui on the applet side (bottom of diagram). 
-hardware: conversion from SMS protocol to IP protocol. conversion from APDU's to requests.
-testing: unit testing for applet, servlet.
-will be testing on a cluster of servers.
-live testing, penetration testing.
-is the code crackable etc.
-
 
 #### 1. Introduction
 #####1.1 Purpose
@@ -76,10 +59,17 @@ SMSGW : SMS Gateway
 #####1.3	Intended Audience and Reading Suggestions
 The document is intended for readers involved in the project directly or indirectly. The technical value of the document is intended for someone with knowledge of development methodologies in programming and networking. 
 #####1.4	Project Scope
-The scope of the project is understanding technologies such as JavaCard,Kannel,WAP,HTTP.
+The scope of the project is understanding technologies such as JavaCard,Kannel,WAP,HTTP.Ultimattly developing a complex and complete solution running on Java and onther platforms.
 #####1.5	References
-1.[http://en.wikipedia.org/wiki/Fortune_(Unix)](http://en.wikipedia.org/wiki/Fortune_(Unix) "fortune on Wikipedia")<br/>
-2.[http://www.kannel.org/](http://www.kannel.org/ "Kannel")
+1.[http://en.wikipedia.org/wiki/Fortune_(Unix)](http://en.wikipedia.org/wiki/Fortune_(Unix))<br>
+2.[http://www.kannel.org/](http://www.kannel.org/)<br>
+3.[http://en.wikipedia.org/wiki/Javacard](http://en.wikipedia.org/wiki/Javacard)
+4.[http://en.wikipedia.org/wiki/Kannel_(telecommunications)](http://en.wikipedia.org/wiki/Kannel_(telecommunications))
+5.[http://en.wikipedia.org/wiki/SMS](http://en.wikipedia.org/wiki/SMS)
+6.[http://en.wikipedia.org/wiki/SMS_gateway](http://en.wikipedia.org/wiki/SMS_gateway)
+7.[http://en.wikipedia.org/wiki/Hypertext_Transfer_Protocol](http://en.wikipedia.org/wiki/Hypertext_Transfer_Protocol)
+
+
 ####2.	Overall Description
 #####2.1	Product Perspective
 Diagram of project's major components<br/>
@@ -103,20 +93,21 @@ DocBook markup language tools (jade, jadetex, DocBook style-sheets, etc; see REA
 N/A
 ####4.	External Interface Requirements
 #####4.1	User Interfaces
-The user interface will be a simple CLI allowing the user to ask for quotes out of the data base.
+On the applet side the UI will resemble the one presented in the start of the Application daiagram in section 2.1 .
 #####4.2	Hardware Interfaces
-Kannel will be used to implement the connection between the application and the Database server which holds the messages.Kannel is a compact and very powerful open source WAP and SMS gateway, used widely across the globe both for serving trillions of short messages (SMS), WAP Push service indications and mobile internet connectivity.(see ref.2)
+Communication between the applet and the server that will return our message will have three stages.Firstly the handset will send a SMS-PP to an SMSC server, from here the data is sent to Kannel.Kannel transform the WAP recieved data into valid HTTP packets.This packet is then sent to a load balancer which delivers it to the first available server in the cluster.Kannel is a compact and very powerful open source WAP and SMS gateway, used widely across the globe both for serving trillions of short messages (SMS), WAP Push service indications and mobile internet connectivity.(see ref.2)
 #####4.3	Software Interfaces
 N/A
 #####4.4	Communications Interfaces
-The communication between the application is performed through SMS technology on one side and HTTP on the other. The "middle man" between these are SMSC and SMSGW servers.
+The communication between the application is performed through SMS-PP technology on one side and HTTP on the other. The "middle man" between these are SMSC and SMSGW(Kannel) servers.
 ####5.	Other Nonfunctional Requirements
 #####5.1	Performance Requirements
-N/A
+The projects target is to support several hundreds of concurrent user accessing the system.Scalability is very important so the system has been planned with this in mind.
 #####5.2	Safety Requirements
-N/A
+Unit testing will be done for the aplet and servlet after development. The servlet will be deployed on a cluster of servers which has to be tested. Live and penetration testing will be implemented.
 #####5.3	Security Requirements
-The application will use a MSISDN which is basically the phone number of the user, this information has to be handled under the Data Protection Act (1998).
+The application will use a MSISDN which in translation is the phone number of the user, this information has to be handled under the Data Protection Act (1998).
+The server will have to be safe from malicious attack as SQL-Injection, DoS(Denial-of-service).
 #####5.4	Software Quality Attributes
 N/A
 ####6.	Other Requirements	N/A
@@ -135,7 +126,7 @@ A short message service center (SMSC) is a network element in the mobile telepho
 The full designation of an SMSC according to 3GPP is Short Message Service - Service Centre (SMS-SC)[http://en.wikipedia.org/wiki/Short_message_service_center](http://en.wikipedia.org/wiki/Short_message_service_center)
 
 #####SMSGW
-SMSGW service allows members to send text messages to mobile phones, using any standard e-mail program or web browser.[http://www.smsgw.com/customers/support#faq_1](http://www.smsgw.com/customers/support#faq_1)
+SMSGW service allows members to send text messages to mobile phones, using any standard e-mail program or web browser.[http://en.wikipedia.org/wiki/SMS_gateway](http://en.wikipedia.org/wiki/SMS_gateway)
 
 #####HTTP
 The Hypertext Transfer Protocol (HTTP) is an application protocol for distributed, collaborative, hypermedia information systems.HTTP is the foundation of data communication for the World Wide Web.
@@ -146,4 +137,4 @@ Hypertext is a multi-linear set of objects, building a network by using logical 
 
 Appendix B: Analysis Models N/A	
 Appendix C: Issues List	N/A
->>>>>>> Draft for software req.
+

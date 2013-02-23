@@ -41,8 +41,22 @@ var servers =  [{
 
 //Shuffles data between the servers in the list
 httpProxy.createServer(function (req, res, proxy) {
-    var target = servers.shift();
-    proxy.proxyRequest(req, res, target);
-    servers.push(target);
+    var target;
+    var srvFound = Boolean(0);
+    while(srvFound == 0){
+        target = servers.shift();
+        try{            
+            proxy.proxyRequest(req, res, target);
+            req.on('connect', function(connect){
+                srvFound = 1;
+            });
+            
+        }finally{
+            servers.push(target);
+        }
+       
+
+
+    }
 }).listen(9999, 'ip_addres_of_kannel');//Listens to ip and port ...
 
