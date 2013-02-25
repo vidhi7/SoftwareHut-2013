@@ -225,7 +225,7 @@ public class FortuneApplet extends Applet implements ToolkitConstants, ToolkitIn
              if(c == 0) {
                  buf = b;
              } else {
-                 dst[dstOff++] = (byte) (short) ((b << ((short) (8 - c)) | buf) & 0xFF);
+                 dst[dstOff+i] = (byte) (short) ((b << ((short) (8 - c)) | buf) & 0xFF);
                  buf = (byte) (b >> c);
              }
          }
@@ -244,7 +244,7 @@ public class FortuneApplet extends Applet implements ToolkitConstants, ToolkitIn
      * @param byaSrc 8bit byte array of data to convert
      * @return 7bit GSM7 encoded 
      */
-    public static Byte[] conv8bitToGsm7(byte[] byaSrc) {
+    public static byte[] conv8bitToGsm7(byte[] byaSrc) {
 
         byte[] dstByaList = new byte[byaSrc.length];
         // arrayPlace is used to find the correct place in the array.
@@ -267,6 +267,8 @@ public class FortuneApplet extends Applet implements ToolkitConstants, ToolkitIn
         if ((byaSrc.length % 8) != 0) {
             dstByaList[ArrayPlace] = (buf);
         }
-        return dstByaList.toArray(new Byte[dstByaList.size()]);
+        return dstByaList;
+//        Error in line:
+//        return dstByaList.toArray(new Byte[dstByaList.size()]);
     }
 }
