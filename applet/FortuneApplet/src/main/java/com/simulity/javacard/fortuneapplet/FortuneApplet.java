@@ -193,6 +193,10 @@ public class FortuneApplet extends Applet implements ToolkitConstants, ToolkitIn
                 // TODO: Convert data from 8-bit ASCII to GSM-7 bit
                 // TODO: Create a sendSms method which can transmit an 
                 // SMS
+                ProactiveHandler proHdlr;
+                proHdlr = ProactiveHandler.getTheHandler();
+                //proHdlr.initDisplayText();
+                proHdlr.send();
                 break;
             case EVENT_FORMATTED_SMS_PP_ENV:
                 EnvelopeHandler envelopeHandler = EnvelopeHandler.getTheHandler();
