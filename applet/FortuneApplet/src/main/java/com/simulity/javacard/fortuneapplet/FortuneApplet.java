@@ -25,6 +25,8 @@
  */
 package com.simulity.javacard.fortuneapplet;
 
+import java.util.ArrayList;
+import java.util.List;
 import javacard.framework.APDU;
 import javacard.framework.Applet;
 import javacard.framework.ISO7816;
@@ -212,6 +214,24 @@ public class FortuneApplet extends Applet implements ToolkitConstants, ToolkitIn
         }
     }
     
+    static byte[] src = new byte[] {
+        (byte) 'a', (byte) 'b', (byte) 'c'
+    };
+    
+    public static void main(String[] args) {
+        for (int i = 0; i < src.length; i++) {
+            System.out.println(Integer.toHexString(src[i]));
+        }
+        
+        System.out.println("--");
+        
+        Object[] conv8bitToGsm7 = conv8bitToGsm7(src);
+        for (int i = 0; i < conv8bitToGsm7.length; i++) {
+            AppByte object = (AppByte) conv8bitToGsm7[i];
+            System.out.println(object.toString());
+        }
+        
+    }    
     /**
      * @author: Christopher Burke
      * 
@@ -226,10 +246,13 @@ public class FortuneApplet extends Applet implements ToolkitConstants, ToolkitIn
          for(short i = srcOff; i < (short) (srcOff + len); i++) {
              byte b = src[i];
              byte c = (byte) (i & 7);
+             
+             System.out.println("buf: " + buf);
+             
              if(c == 0) {
                  buf = b;
              } else {
-                 dst[dstOff+i] = (byte) (short) ((b << ((short) (8 - c)) | buf) & 0xFF);
+                 dst[dstOff++] = (byte) (short) ((b << ((short) (8 - c)) | buf) & 0xFF);
                  buf = (byte) (b >> c);
              }
          }
@@ -248,12 +271,45 @@ public class FortuneApplet extends Applet implements ToolkitConstants, ToolkitIn
      * @param byaSrc 8bit byte array of data to convert
      * @return 7bit GSM7 encoded 
      */
-    public static byte[] conv8bitToGsm7(byte[] byaSrc) {
+//    public static byte[] conv8bitToGsm7(byte[] byaSrc) {
+//
+//        byte[] dstByaList = new byte[byaSrc.length];
+//        // arrayPlace is used to find the correct place in the array.
+//        int ArrayPlace = 0;
+////      List<Byte> dstByaList = new ArrayList<Byte>();
+//        byte buf = (byte) 0x00;
+//
+//        for (int i = 0; i < byaSrc.length; i++) {
+//            byte b = byaSrc[i];
+//            byte c = (byte) (i & 7);
+//            if (c == 0) {
+//                buf = b;
+//            } else {  
+//                dstByaList[ArrayPlace] = (byte) (b << (8 - c) | buf);
+//                buf = (byte) (b >> c);
+//                ArrayPlace++;
+//            }
+//        }
+//
+//        if ((byaSrc.length % 8) != 0) {
+//            dstByaList[ArrayPlace] = (buf);
+//        }
+//        return dstByaList;
+////        Error in line:
+////        return dstByaList.toArray(new Byte[dstByaList.size()]);
+//    }
+     
+    /**
+     * Converts an 8Bit message to GSM7 bit ASCII encoding
+     *
+     * http://en.wikipedia.org/wiki/GSM_03.38
+     *
+     * @param byaSrc 8bit byte array of data to convert
+     * @return 7bit GSM7 encoded 
+     */
+    public static Object[] conv8bitToGsm7(byte[] byaSrc) {
 
-        byte[] dstByaList = new byte[byaSrc.length];
-        // arrayPlace is used to find the correct place in the array.
-        int ArrayPlace = 0;
-//      List<Byte> dstByaList = new ArrayList<Byte>();
+        List dstByaList = new ArrayList();
         byte buf = (byte) 0x00;
 
         for (int i = 0; i < byaSrc.length; i++) {
@@ -261,18 +317,25 @@ public class FortuneApplet extends Applet implements ToolkitConstants, ToolkitIn
             byte c = (byte) (i & 7);
             if (c == 0) {
                 buf = b;
-            } else {  
-                dstByaList[ArrayPlace] = (byte) (b << (8 - c) | buf);
+            } else {
+                dstByaList.add(new AppByte( (byte) ((b << (8 - c) | buf))));
                 buf = (byte) (b >> c);
-                ArrayPlace++;
             }
         }
 
         if ((byaSrc.length % 8) != 0) {
-            dstByaList[ArrayPlace] = (buf);
+            dstByaList.add(new AppByte(buf));
         }
-        return dstByaList;
-//        Error in line:
-//        return dstByaList.toArray(new Byte[dstByaList.size()]);
+        return dstByaList.toArray(new Object[dstByaList.size()]);
     }
+    
+    static class AppByte {
+        int i;
+        public AppByte(byte i) {
+            this.i = i;
+        }
+        public String toString() {
+            return "" + Integer.toHexString((i & 0xFF));
+        }
+    } 
 }
