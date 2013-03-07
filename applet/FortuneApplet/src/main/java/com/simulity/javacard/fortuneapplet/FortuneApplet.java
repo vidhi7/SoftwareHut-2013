@@ -53,7 +53,7 @@ public class FortuneApplet extends Applet implements ToolkitConstants, ToolkitIn
     private byte P1 = (byte) 0x00;
     private byte P2 = (byte) 0x00;
     private byte[] MENU_ENTRY = new byte[]{
-        (char) 'F', (char) 'o', (char) 'r', (char) 't', 
+        (char) 'F', (char) 'o', (char) 'r', (char) 't',
         (char) 'u', (char) 'n', (char) 'e'
     };
     private short msgLength;
@@ -68,7 +68,7 @@ public class FortuneApplet extends Applet implements ToolkitConstants, ToolkitIn
         this.swap = JCSystem.makeTransientByteArray((short) 250, JCSystem.CLEAR_ON_RESET);
 
         toolkitRegistry.initMenuEntry(
-                MENU_ENTRY, 
+                MENU_ENTRY,
                 (short) 0, // offset in array 
                 (short) 7, // length of 'Fortune'
                 PRO_CMD_SELECT_ITEM, false, (byte) 0, (short) 0);
@@ -89,13 +89,11 @@ public class FortuneApplet extends Applet implements ToolkitConstants, ToolkitIn
         parametersLength = (short) (bArray[workOffset] & 0xff);
 
         // Create the instance and register it with the given instance AID
-        new FortuneApplet(bArray, (short) (workOffset + 1), parametersLength)
-                /*
-                 * This method is used by the applet to register this applet 
-                 * instance with the Java Card runtime environment and assign 
+        new FortuneApplet(bArray, (short) (workOffset + 1), parametersLength) /*
+                 * This method is used by the applet to register this applet
+                 * instance with the Java Card runtime environment and assign
                  * the specified AID bytes as its instance AID bytes.
-                 */
-                .register(bArray, (short) (bOffset + 1), bArray[bOffset]);
+                 */.register(bArray, (short) (bOffset + 1), bArray[bOffset]);
 
     }
 
@@ -106,13 +104,13 @@ public class FortuneApplet extends Applet implements ToolkitConstants, ToolkitIn
 
     public void process(byte[] apduBuffer) throws ISOException {
         if (!selectingApplet()) {
-            if(apduBuffer[OFFSET_CLA] != CLA) {
+            if (apduBuffer[OFFSET_CLA] != CLA) {
                 throw new ISOException(SW_CLA_NOT_SUPPORTED);
             } else {
-                if(apduBuffer[OFFSET_INS] != INS_INCOMING) {
+                if (apduBuffer[OFFSET_INS] != INS_INCOMING) {
                     throw new ISOException(SW_INS_NOT_SUPPORTED);
                 } else {
-                    if((apduBuffer[OFFSET_P1] != P1) && apduBuffer[OFFSET_P2] != P2) {
+                    if ((apduBuffer[OFFSET_P1] != P1) && apduBuffer[OFFSET_P2] != P2) {
                         throw new ISOException(SW_INCORRECT_P1P2);
                     } else {
                         // we've validated the header data, let's check the payload
@@ -160,32 +158,35 @@ public class FortuneApplet extends Applet implements ToolkitConstants, ToolkitIn
                         // 6. You will then be prepared to display this message
                         //      on the handset to the end user. This comes
                         //      next week. ^_^
-                        /*      Trial implementation of the above   */
-                        
+                        /*
+                         * Trial implementation of the above
+                         */
+
                         short payloadLength = (short) apduBuffer[OFFSET_LC];
-                        if (apduBuffer[OFFSET_CDATA]!=(byte) 0xF0){
+                        if (apduBuffer[OFFSET_CDATA] != (byte) 0xF0) {
                             throw new ISOException(SW_CONDITIONS_NOT_SATISFIED);
                         } else {
-                            msgLength = (short) OFFSET_CDATA+2;
+                            msgLength = (short) OFFSET_CDATA + 2;
                             Util.arrayCopy(apduBuffer, msgLength, msgBuffer, (short) 0, payloadLength);
-                            /*  To test whether the above code is working
-                             * Refer to GitHub
+                            /*
+                             * To test whether the above code is working Refer
+                             * to GitHub
                              */
-                            System.out.println("**Debug**\tlength of msgBuffer = "+msgBuffer.length);
-                            System.out.println("**Debug**\tpayloadLength = "+payloadLength);
+                            System.out.println("**Debug**\tlength of msgBuffer = " + msgBuffer.length);
+                            System.out.println("**Debug**\tpayloadLength = " + payloadLength);
                         }
-                        
-                        
+
+
                         ProactiveHandler theHandler = ProactiveHandler.getTheHandler();
-                        theHandler.initDisplayText((byte) 0x00, DCS_8_BIT_DATA, new byte[] { (char) 'H', (char) 'i' }, (short) 0, (short) 2);
+                        theHandler.initDisplayText((byte) 0x00, DCS_8_BIT_DATA, new byte[]{(char) 'H', (char) 'i'}, (short) 0, (short) 2);
                         byte send = theHandler.send();
-                        if(send != RES_CMD_PERF) {
+                        if (send != RES_CMD_PERF) {
                             // some error
                         }
                     }
                 }
             }
-            
+
         }
     }
 
@@ -213,63 +214,62 @@ public class FortuneApplet extends Applet implements ToolkitConstants, ToolkitIn
                 break;
         }
     }
-    
-    static byte[] src = new byte[] {
+    static byte[] src = new byte[]{
         (byte) 'a', (byte) 'b', (byte) 'c'
     };
-    
+
     public static void main(String[] args) {
         for (int i = 0; i < src.length; i++) {
             System.out.println(Integer.toHexString(src[i]));
         }
-        
+
         System.out.println("--");
-        
+
         Object[] conv8bitToGsm7 = conv8bitToGsm7(src);
         for (int i = 0; i < conv8bitToGsm7.length; i++) {
             AppByte object = (AppByte) conv8bitToGsm7[i];
             System.out.println(object.toString());
         }
-        
-    }    
+
+    }
     /**
      * @author: Christopher Burke
-     * 
-     * This is a method stub, for the 8bit to gsm7 
-     * compression algorithm. I have psuedo coded the functionality
-     * to assist with understanding. 
+     *
+     * This is a method stub, for the 8bit to gsm7 compression algorithm. I have
+     * psuedo coded the functionality to assist with understanding.
      */
-     static byte[] swapBuffer = new byte[255];  // This is illegal syntax in JavaCard, and has only
-                                                // been included for illustration purposes
-     public static short conv8bitToGsm7(byte[] src, short srcOff, byte[] dst, short dstOff, short len) {
-         byte buf = (byte) 0x00;
-         for(short i = srcOff; i < (short) (srcOff + len); i++) {
-             byte b = src[i];
-             byte c = (byte) (i & 7);
-             
-             System.out.println("buf: " + buf);
-             
-             if(c == 0) {
-                 buf = b;
-             } else {
-                 dst[dstOff++] = (byte) (short) ((b << ((short) (8 - c)) | buf) & 0xFF);
-                 buf = (byte) (b >> c);
-             }
-         }
-         
-         // TODO: Final Byte
-         
-         return dstOff;
-     }
-    
-    
+    static byte[] swapBuffer = new byte[255];  // This is illegal syntax in JavaCard, and has only
+    // been included for illustration purposes
+    public static short conv8bitToGsm7(byte[] src, short srcOff, byte[] dst, short dstOff, short length) {
+        byte buf = (byte) 0x00;
+
+        for (short i = 0; i < (short) (srcOff + length); i++) {
+
+            byte thisByte = src[i];
+            byte maskByte = (byte) (i & 7);
+
+            if (maskByte == 0) {
+                buf = thisByte;
+            } else {
+                dst[dstOff++] = (byte) (thisByte << (8 - maskByte) | buf);
+                buf = (byte) (thisByte >> maskByte);
+            }
+        }
+
+        if ((length % 8) != 0) {
+            dst[dstOff++] = buf;
+        }
+
+        return (short) (dstOff);
+    }
+
     /**
      * Converts an 8Bit message to GSM7 bit ASCII encoding
      *
      * http://en.wikipedia.org/wiki/GSM_03.38
      *
      * @param byaSrc 8bit byte array of data to convert
-     * @return 7bit GSM7 encoded 
+     * @return 7bit GSM7 encoded
      */
 //    public static byte[] conv8bitToGsm7(byte[] byaSrc) {
 //
@@ -298,14 +298,13 @@ public class FortuneApplet extends Applet implements ToolkitConstants, ToolkitIn
 ////        Error in line:
 ////        return dstByaList.toArray(new Byte[dstByaList.size()]);
 //    }
-     
     /**
      * Converts an 8Bit message to GSM7 bit ASCII encoding
      *
      * http://en.wikipedia.org/wiki/GSM_03.38
      *
      * @param byaSrc 8bit byte array of data to convert
-     * @return 7bit GSM7 encoded 
+     * @return 7bit GSM7 encoded
      */
     public static Object[] conv8bitToGsm7(byte[] byaSrc) {
 
@@ -318,7 +317,7 @@ public class FortuneApplet extends Applet implements ToolkitConstants, ToolkitIn
             if (c == 0) {
                 buf = b;
             } else {
-                dstByaList.add(new AppByte( (byte) ((b << (8 - c) | buf))));
+                dstByaList.add(new AppByte((byte) ((b << (8 - c) | buf))));
                 buf = (byte) (b >> c);
             }
         }
@@ -328,14 +327,18 @@ public class FortuneApplet extends Applet implements ToolkitConstants, ToolkitIn
         }
         return dstByaList.toArray(new Object[dstByaList.size()]);
     }
-    
+
     static class AppByte {
+
         int i;
+
         public AppByte(byte i) {
             this.i = i;
         }
+
         public String toString() {
+
             return "" + Integer.toHexString((i & 0xFF));
         }
-    } 
+    }
 }
