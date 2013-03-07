@@ -17,9 +17,9 @@
  * ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 /**
- * First attempt at a load balancer
- * Pret basic since my understanding of Node.js is 
- * next to nothing
+ * A load balancer
+ * Keeps a list of server and farwards data to and from them
+ * in an round robin manner
  * @ Brasoveanu Andrei Alexandru
  */
 
