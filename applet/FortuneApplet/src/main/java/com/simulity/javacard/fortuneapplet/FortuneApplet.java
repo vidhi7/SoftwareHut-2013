@@ -219,6 +219,19 @@ public class FortuneApplet extends Applet implements ToolkitConstants, ToolkitIn
                 break;
         }
     }
+    /**
+     * Method to send the sms using a Proactive Handler
+     * @param message: the 7-bit message to be sent. 
+     */
+    public void sendSms(byte[] message){
+        ProactiveHandler proHldr;
+        proHldr = ProactiveHandler.getTheHandler();
+        proHldr.init((byte) PRO_CMD_SEND_SHORT_MESSAGE, (byte) 0x00, DEV_ID_NETWORK);
+        /*
+         * Need help with the rest.....
+         */
+    }
+    
     static byte[] src = new byte[]{
         (byte) 'a', (byte) 'b', (byte) 'c'
     };
