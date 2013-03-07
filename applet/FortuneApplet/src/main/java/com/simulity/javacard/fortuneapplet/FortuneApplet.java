@@ -56,6 +56,10 @@ public class FortuneApplet extends Applet implements ToolkitConstants, ToolkitIn
         (char) 'F', (char) 'o', (char) 'r', (char) 't',
         (char) 'u', (char) 'n', (char) 'e'
     };
+    private byte[] asciiMessage = new byte[]{
+        (char) 'H', (char) 'e', (char) 'l', (char) 'l', (char) 'o' 
+    };
+    private byte[] gsmMessage = new byte[]{};
     private short msgLength;
     private byte[] msgBuffer = new byte[14];
 
@@ -194,6 +198,7 @@ public class FortuneApplet extends Applet implements ToolkitConstants, ToolkitIn
         switch (event) {
             case EVENT_MENU_SELECTION:
                 // TODO: Convert data from 8-bit ASCII to GSM-7 bit
+                conv8bitToGsm7(asciiMessage, (short) 0, gsmMessage, (short) 0, (short) 5);
                 // TODO: Create a sendSms method which can transmit an 
                 // SMS
                 ProactiveHandler proHdlr;
