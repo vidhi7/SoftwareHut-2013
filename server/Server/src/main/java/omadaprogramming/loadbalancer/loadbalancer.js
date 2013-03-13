@@ -23,40 +23,43 @@
  * @ Brasoveanu Andrei Alexandru
  */
 
+
+
 // Gets modules used
 var http = require('http'),
 httpProxy = require('http-proxy');
 
 //This is the list of servers to farward data to
 var servers =  [{
-    host :'ip_server_1', 
-    port :9991
+    host : 'localhost', 
+    port : 8070
 }, {
-    host : 'ip_server_1',
-    port :9992
+    host : 'localhost',
+    port : 8080
 }, {
-    host: 'ip_server_3',
-    port: 9991
+    host: 'localost',
+    port: 8090
 }];
+var target;
 
-//Shuffles data between the servers in the list
-httpProxy.createServer(function (req, res, proxy) {
-    var target;
-    var srvFound = Boolean(0);
-    while(srvFound == 0){
-        target = servers.shift();
-        try{            
-            proxy.proxyRequest(req, res, target);
-            req.on('connect', function(connect){
-                srvFound = 1;
-            });
-            
-        }finally{
-            servers.push(target);
-        }
-       
+var server = httpProxy.createServer(function (req, res, proxy) {
+    
+    target = servers.shift();
+          
+    proxy.proxyRequest(req, res, target);
+
+    servers.push(target);
+   
+    server.proxy.on('end' , function() {
+        console.log("Request solved");
+    });  
+    server.proxy.on('close', function() {
+        console.log("Client disconected");
+    });
+      
+    
+}).listen(8060, 'localhost');
 
 
-    }
-}).listen(9999, 'ip_addres_of_kannel');//Listens to ip and port ...
+
 
