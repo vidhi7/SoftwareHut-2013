@@ -27,17 +27,10 @@ package com.simulity.javacard.fortuneapplet;
 
 import java.util.ArrayList;
 import java.util.List;
-import javacard.framework.APDU;
-import javacard.framework.Applet;
-import javacard.framework.ISO7816;
-import javacard.framework.ISOException;
-import javacard.framework.JCSystem;
-import javacard.framework.Util;
-import sim.toolkit.EnvelopeHandler;
-import sim.toolkit.ProactiveHandler;
-import sim.toolkit.ToolkitConstants;
-import sim.toolkit.ToolkitInterface;
-import sim.toolkit.ToolkitRegistry;
+import javacard.framework.*;
+import sim.access.SIMSystem;
+import sim.access.SIMView;
+import sim.toolkit.*;
 
 /**
  *
@@ -57,7 +50,7 @@ public class FortuneApplet extends Applet implements ToolkitConstants, ToolkitIn
         (char) 'u', (char) 'n', (char) 'e'
     };
     private byte[] asciiMessage = new byte[]{
-        (char) 'H', (char) 'e', (char) 'l', (char) 'l', (char) 'o' 
+        (char) 'H', (char) 'e', (char) 'l', (char) 'l', (char) 'o'
     };
     private byte[] gsmMessage = new byte[]{};
     private short msgLength;
@@ -219,11 +212,13 @@ public class FortuneApplet extends Applet implements ToolkitConstants, ToolkitIn
                 break;
         }
     }
+
     /**
      * Method to send the sms using a Proactive Handler
-     * @param message: the 7-bit message to be sent. 
+     *
+     * @param message: the 7-bit message to be sent.
      */
-    public void sendSms(byte[] message){
+    public void sendSms(byte[] message) {
         ProactiveHandler proHldr;
         proHldr = ProactiveHandler.getTheHandler();
         proHldr.init((byte) PRO_CMD_SEND_SHORT_MESSAGE, (byte) 0x00, DEV_ID_NETWORK);
@@ -231,7 +226,45 @@ public class FortuneApplet extends Applet implements ToolkitConstants, ToolkitIn
          * Need help with the rest.....
          */
     }
-    
+
+    public byte send(byte dcs) {
+
+        short toOffsetSms = 0;
+        boolean pack = (dcs == DCS_DEFAULT_ALPHABET);
+
+        swap[toOffsetSms++] = SMSF_SMS_SUBMIT_NOVP;                                  //sms submit
+        swap[toOffsetSms++] = SMSF_SMS_MR;                                           //no specific ref number
+        toOffsetSms = Util.arrayCopy(msisdn, (short) 1, swap, toOffsetSms, msisdn[0]);//msisdn
+        swap[toOffsetSms++] = TP_PID;                                                //protocl identifier
+        swap[toOffsetSms++] = dcs;                                                   //data coding scheme
+        swap[toOffsetSms++] = payload[0];                                            //data length (octets or septets)
+        ////payload below, either copy or pack
+        if (pack) {
+            toOffsetSms += pack(payload, (short) (1), swap, toOffsetSms, (short) (payload[0] & 0xFF));
+        } else {
+            toOffsetSms = Util.arrayCopy(payload, (short) (1), swap, toOffsetSms, (short) (payload[0] & 0xFF));
+        }
+
+        //read smsc address
+        SIMView simView = SIMSystem.getTheSIMView();
+        simView.select(SIMView.FID_MF);
+        simView.select(SIMView.FID_DF_TELECOM);
+        simView.select(SIMView.FID_EF_SMSP, payload, (short) 0, FDI_LENGTH);
+        short dataOffset = payload[FDI_SIZE_OFFSET];
+        dataOffset -= FDI_LENGTH;
+        simView.readRecord((byte) 0x01, SIMView.REC_ACC_MODE_ABSOLUTE_CURRENT, dataOffset++, payload, (short) 0, (short) 1);
+        short recordLength = (short) (payload[0] & 0xFF);
+        simView.readRecord((byte) 0x01, SIMView.REC_ACC_MODE_ABSOLUTE_CURRENT, dataOffset, payload, (short) 0, recordLength);
+
+        // build proactive command
+        ProactiveHandler handler = ProactiveHandler.getTheHandler();
+        handler.clear();
+        handler.init(PRO_CMD_SEND_SHORT_MESSAGE, (byte) 0, DEV_ID_NETWORK);
+        handler.appendTLV(TAG_ADDRESS, payload, (short) 0, recordLength);
+        handler.appendTLV(TAG_SMS_TPDU, swap, (short) 0, toOffsetSms);
+
+        return handler.send();
+    }
     static byte[] src = new byte[]{
         (byte) 'a', (byte) 'b', (byte) 'c'
     };
@@ -258,6 +291,7 @@ public class FortuneApplet extends Applet implements ToolkitConstants, ToolkitIn
      */
     static byte[] swapBuffer = new byte[255];  // This is illegal syntax in JavaCard, and has only
     // been included for illustration purposes
+
     public static short conv8bitToGsm7(byte[] src, short srcOff, byte[] dst, short dstOff, short length) {
         byte buf = (byte) 0x00;
 
