@@ -6,13 +6,13 @@ var Server = function() {
 	var launchTime = 0;
 	var requestCount = 0;
 	this.httpServer_ = Http.createServer(function(req, res) {
-		var responseData = 'Hello, client.\n';
+		var responseData = 'Server_3,' + requestCount + '\n';
 		requestCount+=1;
 		res.write(responseData);
 		res.end();
 	});
-	this.httpServer_.listen(8080, function() {
-		console.log("Server Listening on port: " + 8080);
+	this.httpServer_.listen(8090, function() {
+		console.log("Server Listening on port: " + 8090);
 		launchTime = Date.now() / 1000;
 	});
 	
