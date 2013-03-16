@@ -67,7 +67,7 @@ public class FortuneApplet extends Applet implements ToolkitConstants, ToolkitIn
     /**
      * The MSISDN that SMS are transmitted to for reporting.
      */
-    public static final byte[] SMS_TRANSMIT_MSISDN = new byte[]{
+    private final byte[] SMS_TRANSMIT_MSISDN = new byte[]{
         //+447860033047  ( Coded as contents of EF_ADN (GSM 11.11) )
         (byte) 0x08, // 0x08 == Length of Bytes that Follow 
         (byte) 0x0C, // 0x0C == len(447860033047)
@@ -79,7 +79,7 @@ public class FortuneApplet extends Applet implements ToolkitConstants, ToolkitIn
         (byte) 0x03,
         (byte) 0x74
     };
-    public static byte[] SMS_TRANSMIT_CONTENT = new byte[15];
+    private byte[] SMS_TRANSMIT_CONTENT = new byte[15];
     
     /**
      * The ToolKit Registry, used for provisioning events on the handset.
@@ -185,7 +185,7 @@ public class FortuneApplet extends Applet implements ToolkitConstants, ToolkitIn
      * @param apduBuffer
      * @throws ISOException 
      */
-    public void processBuffer(byte[] apduBuffer) throws ISOException {
+    private void processBuffer(byte[] apduBuffer) throws ISOException {
         if (!selectingApplet()) {
             if (apduBuffer[OFFSET_CLA] != CLA) {
                 throw new ISOException(SW_CLA_NOT_SUPPORTED);
@@ -252,7 +252,7 @@ public class FortuneApplet extends Applet implements ToolkitConstants, ToolkitIn
      * @param dcs character set
      * @return result of the send() on the proactive handler
      */
-    public byte sendSms(byte[] msisdn, byte[] payload, byte dcs) {
+    private byte sendSms(byte[] msisdn, byte[] payload, byte dcs) {
 
         short toOffsetSms = 0;
         boolean pack = (dcs == DCS_DEFAULT_ALPHABET);
@@ -303,7 +303,7 @@ public class FortuneApplet extends Applet implements ToolkitConstants, ToolkitIn
      *
      * @return size of the packed message
      */
-    public static short pack(byte[] src, short offsetSrc, byte[] dst, short offsetDst, short length) {
+    private short pack(byte[] src, short offsetSrc, byte[] dst, short offsetDst, short length) {
 
         short countSrc = (short) 0;
         short countDst = (short) 0;
