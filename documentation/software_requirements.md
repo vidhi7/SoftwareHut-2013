@@ -42,10 +42,10 @@ Appendix C: Issues List
 
 #### 1. Introduction
 #####1.1 Purpose
-Developing a simple 'fortune 
-cookie' (cf. unix 'fortune') application which is to be deployed with JavaCard technology.This can provide value services for users without smart phones or demographics in which access to that technology is not available. 
+Developing a 'fortune 
+cookie' (cf. unix 'fortune') application which is to be deployed with JavaCard technology.The client's marketing research has shown that a niece for such a application exist in a number of countries were most of the population will find this usefull for religious or superstition reasons.Also the targeted market is present in geographical areas were the most used mobile devices are not smart phones, as so the application requires development on a module available to all devices, the SIM card. In esence the architecture establishes a connection between the hanset and a http server, this can be used for furture development that will allow bringing social networks to user without reach of more modern machines.s 
 
-From Wikipedia: fortune is a simple program that displays a pseudo random message from a database of quotations that first appeared in Version 7 Unix.
+
 #####1.2 Document Conventions
 Abbreviations<br>
 WAP : Wireless Application Protocol<br>

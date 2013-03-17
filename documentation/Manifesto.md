@@ -13,7 +13,8 @@ The manifesto for this has been shown below:
 - Customer collaboration over contract negotiation
 - Responding to change over following a plan
 
->That is, while there is value in the items on the right, we value the items on the left more.
+
+>That is, while there is value in the items on the right, we value the items on the left more.(WHAT ITEMS WERE?)
 
 We are trying to/have implemented this in various ways including:
 
@@ -23,7 +24,7 @@ We are trying to/have implemented this in various ways including:
 - We have been very involved with the client in terms of the project and made sure our team's vision of the completed software is in line with their needs.
 - Sustainable development has also been achieved in our view as we have been developing at a constant pace.
 - The team has also been self-organising as we have divided the task into 3 manageable chunks to be divided among the four members:
- - The Applet is mine and Dom Lee's responsibility.
- - The Server is being developed by Brasoveanu Andrei Alexandru
- - The Gateway/Kannel implementation has been accepted by Konstantinos Akrivos.
+- The Applet required knowledge in <DELVIN INSERT STUFF HERE>.
+- The Server is being developed using JSP,nodeJS,EDS and RDS technologies. 
+- The Gateway/Kannel implementation has been done according to standards presented in the official documentation .
 - However, it is to be noted that we have set out with the aim of responding to change as we have agreed upon helping other members of the team should they require assistance on any difficulty.
