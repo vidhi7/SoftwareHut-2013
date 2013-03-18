@@ -43,9 +43,12 @@ Appendix C: Issues List
 #### 1. Introduction
 #####1.1 Purpose
 Developing a 'fortune 
-cookie' (cf. unix 'fortune') application which is to be deployed with JavaCard technology.The client's marketing research has shown that a niece for such a application exist in a number of countries were most of the population will find this usefull for religious or superstition reasons.Also the targeted market is present in geographical areas were the most used mobile devices are not smart phones, as so the application requires development on a module available to all devices, the SIM card. In esence the architecture establishes a connection between the hanset and a http server, this can be used for furture development that will allow bringing social networks to user without reach of more modern machines.s 
-
-
+cookie' (cf. unix 'fortune') application which is to be deployed with JavaCard technology.
+The client's marketing research has shown that a niece for such an application exists in several countries were most of the population will find this useful for religious or superstition reasons.
+Also the targeted market is present in geographical areas were the most used mobile devices are not smart phones, 
+as so the application requires development on a module available to all devices, the SIM card. 
+In essence the architecture establishes a connection between the handset and a http server, this can be used for 
+future development that would allow bringing social networks to user without reach of more modern machines.
 #####1.2 Document Conventions
 Abbreviations<br>
 WAP : Wireless Application Protocol<br>
@@ -59,7 +62,8 @@ SMSGW : SMS Gateway
 #####1.3	Intended Audience and Reading Suggestions
 The document is intended for readers involved in the project directly or indirectly. The technical value of the document is intended for someone with knowledge of development methodologies in programming and networking. 
 #####1.4	Project Scope
-The scope of the project is understanding technologies such as JavaCard,Kannel,WAP,HTTP.Ultimattly developing a complex and complete solution running on Java and onther platforms.
+The project aims to give user that do not have access to moder handsets to new technologies. Ultimatly the scope is to construct a 
+basic architecture that can be used for frture advances in the area.
 #####1.5	References
 1.[http://en.wikipedia.org/wiki/Fortune_(Unix)](http://en.wikipedia.org/wiki/Fortune_(Unix))<br>
 2.[http://www.kannel.org/](http://www.kannel.org/)<br>
@@ -73,7 +77,8 @@ The scope of the project is understanding technologies such as JavaCard,Kannel,W
 ####2.	Overall Description
 #####2.1	Product Perspective
 Diagram of project's major components<br/>
-![](http://s7.postimage.org/h1u6cld23/Application_Graph.jpg)
+![System Architecture](SystemArch.jpeg)
+![Use case UML](Use case UML.png)
 #####2.2	Product Features
 The product sole feature is to display a message when requested.
 #####2.3	User Classes and Characteristics
@@ -96,6 +101,8 @@ N/A
 On the applet side the UI will resemble the one presented in the start of the Application daiagram in section 2.1 .
 #####4.2	Hardware Interfaces
 Communication between the applet and the server that will return our message will have three stages.Firstly the handset will send a SMS-PP to an SMSC server, from here the data is sent to Kannel.Kannel transform the WAP recieved data into valid HTTP packets.This packet is then sent to a load balancer which delivers it to the first available server in the cluster.Kannel is a compact and very powerful open source WAP and SMS gateway, used widely across the globe both for serving trillions of short messages (SMS), WAP Push service indications and mobile internet connectivity.(see ref.2)
+The server and database are deploied on the AWS cloud , this was our choice since it provides a strong infrastructure. The servers are instances of AWS EBS and the database is a RDS. AWS Elastic Beanstalk automatically handles the deployment details of capacity provisioning, load balancing, auto-scaling, and application health monitoring.
+Amazon Relational Database Service (RDS) makes it easy to set up, operate, and scale a relational database in the cloud. You launch a Database (DB) Instance with automated backups, turnkey Multi-AZ replication and  monitoring metrics. This implementation help with the balancing of the network as new instances of EBS are automaticaly opened when the previous ones reach a 90% load.
 #####4.3	Software Interfaces
 N/A
 #####4.4	Communications Interfaces
@@ -104,10 +111,13 @@ The communication between the application is performed through SMS-PP technology
 #####5.1	Performance Requirements
 The projects target is to support several hundreds of concurrent user accessing the system.Scalability is very important so the system has been planned with this in mind.
 #####5.2	Safety Requirements
-Unit testing will be done for the aplet and servlet after development. The servlet will be deployed on a cluster of servers which has to be tested. Live and penetration testing will be implemented.
+Unit testing will be done for the aplet and servlet after and during development. The servlet will be deployed on a cluster of servers which has to be tested. Live and penetration testing will be implemented.
 #####5.3	Security Requirements
 The application will use a MSISDN which in translation is the phone number of the user, this information has to be handled under the Data Protection Act (1998).
 The server will have to be safe from malicious attack as SQL-Injection, DoS(Denial-of-service).
+Ciphering SMS from the handset to the server, and vice versa. 
+Redundancy checks for SMS's to make sure they've not been tampered with will be implemented.
+The load balancer, server, ESME/SMSC will all be the same VPN network so that requests can only be accepted on the VPN bind address.
 #####5.4	Software Quality Attributes
 N/A
 ####6.	Other Requirements	N/A
