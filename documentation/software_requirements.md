@@ -1,6 +1,6 @@
 # Software Requirements
 ###for JavaCard Development Simulity
-Version 1.0
+Version 1.1
 Team OmadaProgramming(Team 15)
 Members:
 Brasoveanu Andrei Alexandru
@@ -98,7 +98,7 @@ DocBook markup language tools (jade, jadetex, DocBook style-sheets, etc; see REA
 N/A
 ####4.	External Interface Requirements
 #####4.1	User Interfaces
-On the applet side the UI will resemble the one presented in the start of the Application daiagram in section 2.1 .
+The applets user interface is test based and has only one option, requiesting a fortune message.
 #####4.2	Hardware Interfaces
 Communication between the applet and the server that will return our message will have three stages.Firstly the handset will send a SMS-PP to an SMSC server, from here the data is sent to Kannel.Kannel transform the WAP recieved data into valid HTTP packets.This packet is then sent to a load balancer which delivers it to the first available server in the cluster.Kannel is a compact and very powerful open source WAP and SMS gateway, used widely across the globe both for serving trillions of short messages (SMS), WAP Push service indications and mobile internet connectivity.(see ref.2)
 The server and database are deploied on the AWS cloud , this was our choice since it provides a strong infrastructure. The servers are instances of AWS EBS and the database is a RDS. AWS Elastic Beanstalk automatically handles the deployment details of capacity provisioning, load balancing, auto-scaling, and application health monitoring.
