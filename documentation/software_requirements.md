@@ -1,8 +1,8 @@
 # Software Requirements
 ###for JavaCard Development Simulity
-Version 1.1
-Team OmadaProgramming(Team 15)
-Members:
+Version 1.1	<br>
+Team OmadaProgramming(Team 15)	<br>
+Members:	<br>
 Brasoveanu Andrei Alexandru
 Delvin Varghese
 Dominic Lee
@@ -12,33 +12,33 @@ Konstantinos Akrivos
 ####Table of Contents
 1.  Introduction	
 	1.1	Purpose<br>	
-	1.2	Document Conventions	
-	1.3	Intended Audience and Reading Suggestions	
-	1.4	Project Scope	
+	1.2	Document Conventions<br>	
+	1.3	Intended Audience and Reading Suggestions<br>	
+	1.4	Project Scope<br>	
 	1.5	References	
 2.	Overall Description<br>	
 	2.1	Product Perspective<br>
-	2.2	Product Features	
-	2.3	User Classes and Characteristics	
-	2.4	Operating Environment	
-	2.5	Design and Implementation Constraints	
-	2.6	User Documentation	
+	2.2	Product Features<br>	
+	2.3	User Classes and Characteristics<br>	
+	2.4	Operating Environment<br>	
+	2.5	Design and Implementation Constraints<br>	
+	2.6	User Documentation<br>	
 	2.7	Assumptions and Dependencies	
 3.	System Features	<br>	
 4.	External Interface Requirements<br>	
 	4.1	User Interfaces<br>	
 	4.2	Hardware Interfaces	<br>
 	4.3	Software Interfaces	<br>
-	4.4	Communications Interfaces	
-5.	Other Nonfunctional Requirements	
-	5.1	Performance Requirements	
+	4.4	Communications Interfaces<br>	
+5.	Other Nonfunctional Requirements<br>	
+	5.1	Performance Requirements<br>	
 	5.2	Safety Requirements	<br>
 	5.3	Security Requirements	<br>
-	5.4	Software Quality Attributes	
-6.	Other Requirements	
-Appendix A: Glossary	
-Appendix B: Analysis Models	
-Appendix C: Issues List	
+	5.4	Software Quality Attributes	<br>	
+6.	Other Requirements	<br>	
+Appendix A: Glossary	<br>	
+Appendix B: Analysis Models	<br>	
+Appendix C: Issues List	<br>	
 
 #### 1. Introduction
 #####1.1 Purpose
