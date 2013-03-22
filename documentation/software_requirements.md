@@ -85,7 +85,8 @@ SIM : Subscriber identity module<br>
 SMS : Short Message Service<br>
 MSISDN : Mobile Subscriber Integrated Services Digital Network-Number<br>
 SMSC : short message service center<br>
-SMSGW : SMS Gateway
+SMSGW : SMS Gateway <br>
+SMS-PP : SMS Point-to-Point
 #####1.3	Intended Audience and Reading Suggestions
 The document is intended for readers involved in the project directly or indirectly. The technical value of the document is intended for someone with knowledge of development methodologies in programming and networking. 
 #####1.4	Project Scope
@@ -164,6 +165,9 @@ The full designation of an SMSC according to 3GPP is Short Message Service - Ser
 
 #####SMSGW
 SMSGW service allows members to send text messages to mobile phones, using any standard e-mail program or web browser.[http://en.wikipedia.org/wiki/SMS_gateway](http://en.wikipedia.org/wiki/SMS_gateway)
+
+#####SMS-PP
+SMS point-to-point is the protocol described in the 3GPP TS 23.040 standard fro WAP to HTTP communication.
 
 #####HTTP
 The Hypertext Transfer Protocol (HTTP) is an application protocol for distributed, collaborative, hypermedia information systems.HTTP is the foundation of data communication for the World Wide Web.
