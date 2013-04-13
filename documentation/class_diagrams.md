@@ -5,4 +5,4 @@
 
 The class diagrams are shown below:
 
-![Use case image](classdiagram.png)
+![Use case image](img/classdiagram.png)
