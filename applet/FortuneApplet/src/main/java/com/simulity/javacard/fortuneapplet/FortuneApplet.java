@@ -79,8 +79,10 @@ public class FortuneApplet extends Applet implements ToolkitConstants, ToolkitIn
         (byte) 0x03,
         (byte) 0x74
     };
+    /**
+     * The Content of the SMS Transmission
+     */
     private byte[] SMS_TRANSMIT_CONTENT = new byte[15];
-    
     /**
      * The ToolKit Registry, used for provisioning events on the handset.
      */
@@ -110,12 +112,12 @@ public class FortuneApplet extends Applet implements ToolkitConstants, ToolkitIn
         this.swap_buffer = JCSystem.makeTransientByteArray((short) 250, JCSystem.CLEAR_ON_RESET);
         this.sms_buffer = JCSystem.makeTransientByteArray((short) 160, JCSystem.CLEAR_ON_RESET);
         this.SMS_TRANSMIT_CONTENT = JCSystem.makeTransientByteArray((short) 15, JCSystem.CLEAR_ON_RESET);
-        
+
         SMS_TRANSMIT_CONTENT[0] = (byte) 0x06; // Length
         // FASW == Fortune Applet Software Hut -- Identifies this applet on the server
         // for message routing 
-        
-        SMS_TRANSMIT_CONTENT[1] = (byte) 'F'; 
+
+        SMS_TRANSMIT_CONTENT[1] = (byte) 'F';
         SMS_TRANSMIT_CONTENT[2] = (byte) 'A';
         SMS_TRANSMIT_CONTENT[3] = (byte) 'S';
         SMS_TRANSMIT_CONTENT[4] = (byte) 'H';
@@ -136,8 +138,8 @@ public class FortuneApplet extends Applet implements ToolkitConstants, ToolkitIn
      * The Install method, called by the JCVM
      *
      * @param bArray
-     * @param bOffset
-     * @param bLength
+     * @param bOffset: offset in bArray
+     * @param bLength: length of bArray
      * @throws ISOException
      */
     public static void install(byte[] bArray, short bOffset, byte bLength) throws ISOException {
@@ -177,13 +179,14 @@ public class FortuneApplet extends Applet implements ToolkitConstants, ToolkitIn
 
     /**
      * Process an APDU buffer in the Applet
-     * 
-     * Example APDU for Simulator: 
-     * 
-     * apdu 0A01000020466F74696E7565204170706C657420666F7220536F6674776172652048757421
-     * 
+     *
+     * Example APDU for Simulator:
+     *
+     * apdu
+     * 0A01000020466F74696E7565204170706C657420666F7220536F6674776172652048757421
+     *
      * @param apduBuffer
-     * @throws ISOException 
+     * @throws ISOException
      */
     private void processBuffer(byte[] apduBuffer) throws ISOException {
         if (!selectingApplet()) {
@@ -196,10 +199,11 @@ public class FortuneApplet extends Applet implements ToolkitConstants, ToolkitIn
                     if ((apduBuffer[OFFSET_P1] != P1) && apduBuffer[OFFSET_P2] != P2) {
                         throw new ISOException(SW_INCORRECT_P1P2);
                     } else {
+                        // If it passes validation, display Fortune Menu
                         short payloadLength = (short) (apduBuffer[OFFSET_LC] & 0xFF);
                         ProactiveHandler theHandler = ProactiveHandler.getTheHandler();
                         theHandler.initDisplayText((byte) 0x01, DCS_8_BIT_DATA, apduBuffer, (short) 5, payloadLength);
-                        if(theHandler.send() == RES_CMD_PERF) {
+                        if (theHandler.send() == RES_CMD_PERF) {
                             displayFortuneMenu();
                         }
                     }
@@ -208,24 +212,24 @@ public class FortuneApplet extends Applet implements ToolkitConstants, ToolkitIn
 
         }
     }
-    
+
     /**
-     * If we want to do any additional processing after the fortune message,
-     * it should go here.
+     * If we want to do any additional processing after the fortune message, it
+     * should go here.
      */
     private void displayFortuneMenu() {
         return;
     }
 
     /**
-     * When an event is fired, this logic is called. 
-     * 
-     * @param event 
+     * When an event is fired, this logic is called.
+     *
+     * @param event
      */
     public void processToolkit(byte event) {
         switch (event) {
             case EVENT_MENU_SELECTION:
-                if(sendSms(SMS_TRANSMIT_MSISDN, SMS_TRANSMIT_CONTENT, DCS_DEFAULT_ALPHABET) != RES_CMD_PERF) {
+                if (sendSms(SMS_TRANSMIT_MSISDN, SMS_TRANSMIT_CONTENT, DCS_DEFAULT_ALPHABET) != RES_CMD_PERF) {
                     ISOException.throwIt(SW_UNKNOWN);
                 }
                 break;
@@ -245,8 +249,8 @@ public class FortuneApplet extends Applet implements ToolkitConstants, ToolkitIn
     }
 
     /**
-     * Sends an SMS 
-     * 
+     * Sends an SMS
+     *
      * @param msisdn where to send the message
      * @param payload what to sent
      * @param dcs character set
