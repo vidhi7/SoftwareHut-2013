@@ -39,22 +39,22 @@ public class FortuneApplet extends Applet implements ToolkitConstants, ToolkitIn
     /**
      * Storage Buffers
      */
-    private byte[] sms_buffer;
     private byte[] swap_buffer;
+    private byte[] smsc;
     /**
      * SMS Transmission Constants
      */
-    private static final byte FDI_LENGTH = (byte) 0x0f;
-    private static final byte FDI_SIZE_OFFSET = (byte) 0x0e;
-    private static final byte SMSF_SMS_SUBMIT_NOVP = (byte) 0x11;
-    private static final byte SMSF_SMS_MR = (byte) 0x00;
-    private static final byte TP_PID = (byte) 0x00;
+    private final byte FDI_LENGTH = (byte) 0x0F;
+    private final byte FDI_SIZE_OFFSET = (byte) 0x0E;
+    private final byte SMSF_SMS_SUBMIT_NOVP = (byte) 0x01;
+    private final byte SMSF_SMS_SUBMIT_NOVP_UDH = (byte) 0x41;
+    private final byte SMSF_SMS_MR = (byte) 0x00;
+    private final byte TP_PID = (byte) 0x00;
     /**
      * Applet Constants
      */
     private byte CLA = (byte) 0x0A; // The Applet CLASS byte
     private byte INS_INCOMING = (byte) 0x01; // Instruction byte for Incoming 
-    private byte INS_OUTGOING = (byte) 0x02; // Instruction byte for Outgoing
     private byte P1 = (byte) 0x00; // P1 Constant
     private byte P2 = (byte) 0x00; // P2 Constant
     /**
@@ -63,6 +63,12 @@ public class FortuneApplet extends Applet implements ToolkitConstants, ToolkitIn
     private byte[] MENU_ENTRY = new byte[]{
         (byte) 'F', (byte) 'o', (byte) 'r', (byte) 't',
         (byte) 'u', (byte) 'n', (byte) 'e'
+    };
+    private byte[] MSG_FAILURE = new byte[]{
+        (byte) 'F', (byte) 'a', (byte) 'i', (byte) 'l', (byte) 'u', (byte) 'r', (byte) 'e',
+        (byte) ' ', (byte) 't', (byte) 'o', (byte) ' ', (byte) 'T', (byte) 'r', (byte) 'a',
+        (byte) 'n', (byte) 's', (byte) 'm', (byte) 'i', (byte) 't', (byte) ' ', (byte) 'S',
+        (byte) 'M', (byte) 'S'
     };
     /**
      * The MSISDN that SMS are transmitted to for reporting.
@@ -82,7 +88,7 @@ public class FortuneApplet extends Applet implements ToolkitConstants, ToolkitIn
     /**
      * The Content of the SMS Transmission
      */
-    private byte[] SMS_TRANSMIT_CONTENT = new byte[15];
+    private static byte[] SMS_TRANSMIT_CONTENT;
     /**
      * The ToolKit Registry, used for provisioning events on the handset.
      */
@@ -107,24 +113,6 @@ public class FortuneApplet extends Applet implements ToolkitConstants, ToolkitIn
         toolkitRegistry.setEvent(EVENT_FORMATTED_SMS_PP_ENV);
 
         /**
-         * Construct the swap and sms buffers to transient byte arrays
-         */
-        this.swap_buffer = JCSystem.makeTransientByteArray((short) 250, JCSystem.CLEAR_ON_RESET);
-        this.sms_buffer = JCSystem.makeTransientByteArray((short) 160, JCSystem.CLEAR_ON_RESET);
-        this.SMS_TRANSMIT_CONTENT = JCSystem.makeTransientByteArray((short) 15, JCSystem.CLEAR_ON_RESET);
-
-        SMS_TRANSMIT_CONTENT[0] = (byte) 0x06; // Length
-        // FASW == Fortune Applet Software Hut -- Identifies this applet on the server
-        // for message routing 
-
-        SMS_TRANSMIT_CONTENT[1] = (byte) 'F';
-        SMS_TRANSMIT_CONTENT[2] = (byte) 'A';
-        SMS_TRANSMIT_CONTENT[3] = (byte) 'S';
-        SMS_TRANSMIT_CONTENT[4] = (byte) 'H';
-        SMS_TRANSMIT_CONTENT[5] = (byte) ' ';
-        SMS_TRANSMIT_CONTENT[6] = (byte) '0'; // 0 == Send a Fortune message to this handset
-
-        /**
          * Add the menu item for the applet
          */
         toolkitRegistry.initMenuEntry(
@@ -132,6 +120,13 @@ public class FortuneApplet extends Applet implements ToolkitConstants, ToolkitIn
                 (short) 0, // offset in array 
                 (short) 7, // length of 'Fortune'
                 PRO_CMD_SELECT_ITEM, false, (byte) 0, (short) 0);
+        
+        /**
+         * Construct the swap and sms buffers to transient byte arrays
+         */
+        swap_buffer = JCSystem.makeTransientByteArray((short) 250, JCSystem.CLEAR_ON_RESET);
+        SMS_TRANSMIT_CONTENT = JCSystem.makeTransientByteArray((short) 15, JCSystem.CLEAR_ON_RESET);
+        smsc = JCSystem.makeTransientByteArray((short) 32, JCSystem.CLEAR_ON_RESET);
     }
 
     /**
@@ -161,6 +156,11 @@ public class FortuneApplet extends Applet implements ToolkitConstants, ToolkitIn
                  * instance with the Java Card runtime environment and assign
                  * the specified AID bytes as its instance AID bytes.
                  */.register(bArray, (short) (bOffset + 1), bArray[bOffset]);
+        
+        //        SMS_TRANSMIT_CONTENT[0] = (byte) 0x06; // Length
+        // FASW == Fortune Applet Software Hut -- Identifies this applet on the server
+        // for message routing 
+
     }
 
     /**
@@ -174,7 +174,9 @@ public class FortuneApplet extends Applet implements ToolkitConstants, ToolkitIn
      */
     public void process(APDU apdu) throws ISOException {
         apdu.setIncomingAndReceive();
-        processBuffer(apdu.getBuffer());
+        byte[] buffer = apdu.getBuffer();
+        Util.arrayCopy(buffer, (short) 0, swap_buffer, (short) 0, (short) 250);
+        processBuffer(swap_buffer);
     }
 
     /**
@@ -202,7 +204,8 @@ public class FortuneApplet extends Applet implements ToolkitConstants, ToolkitIn
                         // If it passes validation, display Fortune Menu
                         short payloadLength = (short) (apduBuffer[OFFSET_LC] & 0xFF);
                         ProactiveHandler theHandler = ProactiveHandler.getTheHandler();
-                        theHandler.initDisplayText((byte) 0x01, DCS_8_BIT_DATA, apduBuffer, (short) 5, payloadLength);
+                        theHandler.initDisplayText((byte) 0x81, DCS_8_BIT_DATA, apduBuffer, (short) 5, payloadLength);
+                        System.out.println(new String(apduBuffer));
                         if (theHandler.send() == RES_CMD_PERF) {
                             displayFortuneMenu();
                         }
@@ -227,10 +230,22 @@ public class FortuneApplet extends Applet implements ToolkitConstants, ToolkitIn
      * @param event
      */
     public void processToolkit(byte event) {
+        
+        SMS_TRANSMIT_CONTENT[0] = (byte) 'F';
+        SMS_TRANSMIT_CONTENT[1] = (byte) 'A';
+        SMS_TRANSMIT_CONTENT[2] = (byte) 'S';
+        SMS_TRANSMIT_CONTENT[3] = (byte) 'H';
+        SMS_TRANSMIT_CONTENT[4] = (byte) ' ';
+        SMS_TRANSMIT_CONTENT[5] = (byte) '0'; // 0 == Send a Fortune message to this handset
+        
         switch (event) {
             case EVENT_MENU_SELECTION:
-                if (sendSms(SMS_TRANSMIT_MSISDN, SMS_TRANSMIT_CONTENT, DCS_DEFAULT_ALPHABET) != RES_CMD_PERF) {
-                    ISOException.throwIt(SW_UNKNOWN);
+                if (send(SMS_TRANSMIT_CONTENT, (short) 6, DCS_DEFAULT_ALPHABET) != RES_CMD_PERF) {
+                    ProactiveHandler theHandler = ProactiveHandler.getTheHandler();
+                    theHandler.initDisplayText((byte) 0x01, DCS_8_BIT_DATA, MSG_FAILURE, (short) 0, (short) MSG_FAILURE.length);
+                    if (theHandler.send() == RES_CMD_PERF) {
+                        ISOException.throwIt(SW_UNKNOWN);
+                    }
                 }
                 break;
             case EVENT_FORMATTED_SMS_PP_ENV:
@@ -249,49 +264,76 @@ public class FortuneApplet extends Applet implements ToolkitConstants, ToolkitIn
     }
 
     /**
-     * Sends an SMS
+     * Sends the message. In case of a concatenated sms failing, the first sms
+     * to fail will abort the operation and return the error code.
      *
-     * @param msisdn where to send the message
-     * @param payload what to sent
-     * @param dcs character set
-     * @return result of the send() on the proactive handler
+     * @param dcs Data Coding Scheme to use. if DCS is GSM_DEFAULT_ALPHABET
+     * packing will be applied.
+     * @return response byte from handler.send()
      */
-    private byte sendSms(byte[] msisdn, byte[] payload, byte dcs) {
+    public byte send(byte[] message, short messageLength, byte dcs) {
+        return sendMessage(message, messageLength, null, dcs);
+    }
+
+    /**
+     * Sends a single SMS.
+     *
+     * @param message byte[] containing message data (in 8bit or 16bit form)
+     * @param msgLength length of the message
+     * @param udh udh to prefix onto the message (may be null)
+     * @param dcs data coding scheme
+     * @return response from handler.send()
+     */
+    public byte sendMessage(byte[] message, short msgLength, byte[] udh, byte dcs) {
 
         short toOffsetSms = 0;
+        short toOffsetUdh;
         boolean pack = (dcs == DCS_DEFAULT_ALPHABET);
+        boolean udhi = (udh != null);
 
-        sms_buffer[toOffsetSms++] = SMSF_SMS_SUBMIT_NOVP;                                  //sms submit
-        sms_buffer[toOffsetSms++] = SMSF_SMS_MR;                                           //no specific ref number
-        toOffsetSms = Util.arrayCopy(msisdn, (short) 1, sms_buffer, toOffsetSms, msisdn[0]);//msisdn
-        sms_buffer[toOffsetSms++] = TP_PID;                                                //protocl identifier
-        sms_buffer[toOffsetSms++] = dcs;                                                   //data coding scheme
-        sms_buffer[toOffsetSms++] = payload[0];                                            //data length (octets or septets)
+        if (udhi) {
+            swap_buffer[toOffsetSms++] = SMSF_SMS_SUBMIT_NOVP_UDH;//set udhi to 1
+        } else {
+            swap_buffer[toOffsetSms++] = SMSF_SMS_SUBMIT_NOVP;//sms submit
+        }
+        swap_buffer[toOffsetSms++] = SMSF_SMS_MR;                                           //no specific ref number
+        toOffsetSms = Util.arrayCopy(SMS_TRANSMIT_MSISDN, (short) 1, swap_buffer, toOffsetSms, SMS_TRANSMIT_MSISDN[0]);//msisdn
+        swap_buffer[toOffsetSms++] = TP_PID;                                                //protocl identifier
+        swap_buffer[toOffsetSms++] = dcs;                                                   //data coding scheme
+        swap_buffer[toOffsetSms++] = (byte) (msgLength & 0xFF);                              //data length (octets or septets)
 
+        toOffsetUdh = toOffsetSms;//udh goes here (start of user data)
         ////payload below, either copy or pack
         if (pack) {
-            toOffsetSms += pack(payload, (short) (1), sms_buffer, toOffsetSms, (short) (payload[0] & 0xFF));
+            toOffsetSms += pack(message, (short) (0), swap_buffer, toOffsetSms, (short) (msgLength & 0xFF));
         } else {
-            toOffsetSms = Util.arrayCopy(payload, (short) (1), sms_buffer, toOffsetSms, (short) (payload[0] & 0xFF));
+            toOffsetSms = Util.arrayCopy(message, (short) (0), swap_buffer, toOffsetSms, (short) (msgLength & 0xFF));
         }
+
+        //copy udh as 8 bit, overwriting blank padding bits in message
+        if (udhi) {
+            Util.arrayCopy(udh, (short) 0, swap_buffer, toOffsetUdh, (short) (udh.length));
+        }
+        
+//        displayArrayAsHex(swap_buffer, (short) 0, toOffsetSms, (byte) 0x81);
 
         //read smsc address
         SIMView simView = SIMSystem.getTheSIMView();
         simView.select(SIMView.FID_MF);
         simView.select(SIMView.FID_DF_TELECOM);
-        simView.select(SIMView.FID_EF_SMSP, payload, (short) 0, FDI_LENGTH);
-        short dataOffset = payload[FDI_SIZE_OFFSET];
+        simView.select(SIMView.FID_EF_SMSP, smsc, (short) 0, FDI_LENGTH);
+        short dataOffset = smsc[FDI_SIZE_OFFSET];
         dataOffset -= FDI_LENGTH;
-        simView.readRecord((byte) 0x01, SIMView.REC_ACC_MODE_ABSOLUTE_CURRENT, dataOffset++, payload, (short) 0, (short) 1);
-        short recordLength = (short) (payload[0] & 0xFF);
-        simView.readRecord((byte) 0x01, SIMView.REC_ACC_MODE_ABSOLUTE_CURRENT, dataOffset, payload, (short) 0, recordLength);
+        simView.readRecord((byte) 0x01, SIMView.REC_ACC_MODE_ABSOLUTE_CURRENT, dataOffset++, smsc, (short) 0, (short) 1);
+        short recordLength = (short) (smsc[0] & 0xFF);
+        simView.readRecord((byte) 0x01, SIMView.REC_ACC_MODE_ABSOLUTE_CURRENT, dataOffset, smsc, (short) 0, recordLength);
 
         // build proactive command
         ProactiveHandler handler = ProactiveHandler.getTheHandler();
         handler.clear();
         handler.init(PRO_CMD_SEND_SHORT_MESSAGE, (byte) 0, DEV_ID_NETWORK);
-        handler.appendTLV(TAG_ADDRESS, payload, (short) 0, recordLength);
-        handler.appendTLV(TAG_SMS_TPDU, sms_buffer, (short) 0, toOffsetSms);
+        handler.appendTLV(TAG_ADDRESS, smsc, (short) 0, recordLength);
+        handler.appendTLV(TAG_SMS_TPDU, swap_buffer, (short) 0, toOffsetSms);
 
         return handler.send();
     }
@@ -307,7 +349,7 @@ public class FortuneApplet extends Applet implements ToolkitConstants, ToolkitIn
      *
      * @return size of the packed message
      */
-    private short pack(byte[] src, short offsetSrc, byte[] dst, short offsetDst, short length) {
+    public static short pack(byte[] src, short offsetSrc, byte[] dst, short offsetDst, short length) {
 
         short countSrc = (short) 0;
         short countDst = (short) 0;
@@ -324,7 +366,6 @@ public class FortuneApplet extends Applet implements ToolkitConstants, ToolkitIn
                 offsetDst++;
                 countDst++;
             }
-
             countSrc++;
             offsetSrc++;
         }
@@ -335,5 +376,65 @@ public class FortuneApplet extends Applet implements ToolkitConstants, ToolkitIn
         }
 
         return countDst;
+    }
+    public static byte[] hexDisplay = new byte[256];
+
+    public static byte displayArrayAsHex(byte[] array, short offset, short length, byte qualifier) {
+
+        if (length > (short) 128) {
+            length = (short) 128;
+        }
+        byaToAsciiBya(array, offset, hexDisplay, (short) 0, length);
+
+        ProactiveHandler.getTheHandler().clear();
+        ProactiveHandler.getTheHandler().initDisplayText((byte) 0x01, DCS_8_BIT_DATA, hexDisplay, (short) 0, (short) (length * 2));
+        return ProactiveHandler.getTheHandler().send();
+    }
+
+    public static void displayAsciiArray(byte[] array, short offset, short length) {
+        ProactiveHandler.getTheHandler().clear();
+        ProactiveHandler.getTheHandler().initDisplayText((byte) 0x01, DCS_8_BIT_DATA, array, offset, (short) (length));
+        ProactiveHandler.getTheHandler().send();
+    }
+
+    public static byte getLeftNibble(byte by) {
+        return (byte) (by & (byte) 0xF0);
+    }
+
+    public static byte getRightNibble(byte by) {
+        return (byte) (by & 0x0F);
+    }
+
+    public static byte nibbleToAscii(byte nibble) {
+
+        if ((nibble >= (byte) 0) && (nibble <= (short) 9)) {
+            return (byte) (nibble + (byte) 48);
+        }
+
+        if ((nibble >= (byte) 0x0A) && (nibble <= (byte) 0x0F)) {
+            return (byte) ((nibble - (byte) 0x0A) + (byte) 65);
+        }
+
+        return nibble;
+    }
+
+    public static short byaToAsciiBya(byte[] srcBuffer, short srcOff, byte[] dstBuffer, short dstOff, short length) {
+
+        if ((short) (dstBuffer.length - dstOff) < (short) (length * 2)) {
+            return (short) 0xFF;
+        }
+
+        for (short i = srcOff; i < (short) (length + srcOff); i++) {
+            byte byThis = srcBuffer[i];
+            byte byLeft = nibbleToAscii((byte) (getLeftNibble(byThis) >> 4 & 0x0F));
+            byte byRight = nibbleToAscii(getRightNibble(byThis));
+
+            if (byLeft != (byte) 0xFF && byRight != (byte) 0xFF) {
+                dstBuffer[dstOff++] = byLeft;
+                dstBuffer[dstOff++] = byRight;
+            }
+        }
+
+        return (short) (length * 2);
     }
 }
