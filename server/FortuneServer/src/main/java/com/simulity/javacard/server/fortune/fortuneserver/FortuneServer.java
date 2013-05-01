@@ -105,6 +105,8 @@ public class FortuneServer extends HttpServlet {
                                 
                                 // regex by alex to replace any patters of > 2 spaces with 1 space
                                 
+                                fortune = fortune.trim().replaceAll(" +", " ");
+                                
                                 if(fortune.length() > 70) {
                                     fortune = fortune.substring(0, 67) + "...";
                                 }
