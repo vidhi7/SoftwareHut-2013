@@ -1,12 +1,9 @@
 #Applet
 ###Definition
-This document explains the client-side architecture and implementation of the Fortune software. Its scope is limited to the Java Card language specification, the industry specifications, code review of the client implementation and key terminology needed to understand the concepts of this applet. 
+This document explains the client-side architecture and implementation of the Fortune software. Its scope is limited to the Java Card language specification, the industry specifications, code review of the client implementation and key terminology needed to understand the concepts of this applet.
 
+Applet: The technical definition[1] of the term is: “an applet is any small application that performs one specific task that runs within the scope of a larger program” In this document, applet refers to our piece of code running on the SIM card of a GSM mobile phone. This represents the client software in this client-server relationship. The project consists of this applet, a server and a communication protocol which includes elements from the mobile telephone network which enable the SIM to send and receive messages to/from the server.
 
-Applet: The technical definition[1] of the term is: 
-“an applet is any small application that performs one specific task that runs within the scope of a larger program”
-In this document, applet refers to the collective piece of code running on the SIM card of a GSM mobile phone. This represents the client software in this client-server relationship.
-The project consists of this applet, a server and a communication protocol which includes elements from the mobile telephone network which enable the SIM to send and receive messages to/from the server.
 #Coding
 ###Overview
 The client side has been written entirely in Javacard. 
@@ -19,20 +16,12 @@ Java Card allows Java-based applications to be run on smart cards. Also it has a
 
 These are some of the reasons why our client uses JavaCard for their development. 
 ###More Info
-Java Card defines a Java Card Runtime Environment (JCRE) and provides classes and methods to help developers create applets. Applets run within the JCRE. The JCRE and APIs are modelled after the smart card specification ISO 7816.
-Java Card aims to emulate the portability features of Java (Oracle famously employed the slogan “Write Once, run anywhere” to describe Java). 
+Java Card defines a Java Card Runtime Environment (JCRE) and provides a limited list of classes and methods compared to java. Certain classes are not supported by Java Card because the product will eventually be ported to a smart card and so it very limited by size. Although the list is extensive enough to help developers create applets which are run within the JCRE. The JCRE and APIs are modelled after the smart card specification ISO 7816. Java Card aims to emulate the portability features of Java (Oracle famously employed the slogan “Write Once, run anywhere” to describe Java).
 
 It does so by using the Java Card Virtual Machine and the JCRE which enables it to run abstractly regardless of differences between different cards. It also supports cryptography, firewall and data encapsulation for security requirements.
+
 ##Java Card and Java
-.
-
-
-.
-
-.
-
-
-
+Java is a class based object orientated programming language its major quality is that once the code has been interpreted into byte code it can be ran on any Java virtual machine, regardless of architecture. Java-Card is the smallest branch of Java designed for making applets specifically aimed at embedded devices. All the language constructs that exist in java are in Java-Card and behave in exactly the same way. Even though this is the case Java-Card does not support types char, double, float, long and arrays of more than one dimension, and also the int type is not supported by most smart cards themselves. Because of these limitations the ways in which problems are solved subtly differ. The Java-Card applet is limited in the above way to save on size as this is a valuable resource in a smart card. A smart card may hold many applets and as Java Security Manager class is not supported in Java Card, it has its own security measures. One of which is the Java Card firewall which separates the applets form each other, it also includes an option to allow an applet to make a variable available to other applets.
 
 
 ##Coding Explanations
