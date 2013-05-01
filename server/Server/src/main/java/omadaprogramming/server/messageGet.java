@@ -50,6 +50,7 @@ public class messageGet extends HttpServlet {
         PrintWriter out = response.getWriter();
         String message = PullQuote.getQuote();
         try {
+            
             out.println(message);
         } finally {
             out.close();

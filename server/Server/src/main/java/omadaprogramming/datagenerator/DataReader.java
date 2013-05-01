@@ -23,14 +23,12 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.InputStream;
 import java.sql.Connection;
-import java.sql.ResultSet;
 import java.sql.Statement;
 import omadaprogramming.server.DataSource;
-import omadaprogramming.server.PullQuote;
 
 /**
- * This class uses default fortune data files It parses them and turn each
- * message into a SQL statement that is executed afterwards
+ * This class uses default fortune data files, parses them and turns each
+ * message into a SQL statement to be executed afterwards
  *
  * @author Brasoveanu Andrei Alexandru
  */
