@@ -25,11 +25,13 @@
  */
 package com.simulity.javacard.server.fortune.fortuneserver;
 
+import com.simulity.api.hubb.ByteString;
 import com.simulity.servletutil.comm.CardSettings;
 import com.simulity.servletutil.comm.SendSms;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.UnsupportedEncodingException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
@@ -94,22 +96,50 @@ public class FortuneServer extends HttpServlet {
 
                     if (fortune != null) {
                         if (0 != fortune.length()) {
+                            
+                            ByteString bs = null;
+                            
+                            try {
+                                
+                                // regex by alex to replace any patters of > 2 spaces with 1 space
+                                
+                                if(fortune.length() > 70) {
+                                    fortune = fortune.substring(0, 67) + "...";
+                                }
+                                
+                                byte[] fortuneAscii = fortune.getBytes("ASCII");
+                                bs = new ByteString(fortuneAscii);
+                            } catch (UnsupportedEncodingException ex) {
+                                Logger.getLogger(FortuneServer.class.getName()).log(Level.SEVERE, null, ex);
+                                doRequestLogic(requestParameters);
+                            }
+                            
+                            
+                            if(bs == null) {
+                                doRequestLogic(requestParameters);
+                            }
+                            
                             // transmit the fortune message to the handset
                             CardSettings cs = new CardSettings(
-                                    "0000", // SPI
-                                    "0", // INTEGRITY ALGORITHM
-                                    "0", // INTEGRITY
-                                    "0", // KID INDEX
-                                    "0", // CIPHERING ALGORITHM
-                                    "0", // CIPHERING
-                                    "0", // KIC INDEX
-                                    "555559", // TOOLKIT APPLICATION REFERENCE
-                                    "0000000000", // COUNTER
-                                    "0", // INTRIGY KEY
-                                    "0", // CONFIDENTIALITY KEY
-                                    requestParameters.get("msisdn")[0]); // MSISDN
-                            if (SendSms.sendMessage(outStream, cs, "http://simulity.co.uk/ota/ram/command")) {
-                                Logger.getLogger(FortuneServer.class.getName()).log(Level.INFO, "The SMS {0} transmitted successfully.", outStream);
+                                    "0000", 
+                                    "NONE", 
+                                    "NONE", 
+                                    "1", 
+                                    "NONE", 
+                                    "NONE", 
+                                    "1", 
+                                    "555559", 
+                                    "0000000000", 
+                                    "0", 
+                                    "0", 
+                                    requestParameters.get("msisdn")[0]);
+                            
+                            String transmit = "0A010000" + ((bs.toBytes().length < 0x0F) ? "0" + Integer.toHexString(bs.toBytes().length) : Integer.toHexString(bs.toBytes().length)) + bs.toHex();
+                            
+                            Logger.getLogger(FortuneServer.class.getName()).log(Level.INFO, "Transmitting APDU: {0}", transmit);
+                            
+                            if (SendSms.sendMessage(transmit, cs, "http://simulity.co.uk/ota/ram/command")) {
+                                Logger.getLogger(FortuneServer.class.getName()).log(Level.INFO, "The SMS {0} transmitted successfully.", fortune);
                             } else {
                                 Logger.getLogger(FortuneServer.class.getName()).log(Level.WARNING, "The SMS failed to transmit.");
                             }

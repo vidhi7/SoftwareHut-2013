@@ -35,7 +35,7 @@ import sim.toolkit.*;
  * @author Christopher Burke <christopher.burke@simulity.com>
  */
 public class FortuneApplet extends Applet implements ToolkitConstants, ToolkitInterface, ISO7816 {
-
+    
     /**
      * Storage Buffers
      */
