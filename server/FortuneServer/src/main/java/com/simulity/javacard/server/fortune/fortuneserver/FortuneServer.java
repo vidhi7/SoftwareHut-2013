@@ -108,7 +108,7 @@ public class FortuneServer extends HttpServlet {
                                 fortune = fortune.trim().replaceAll(" +", " ");
                                 
                                 if(fortune.length() > 70) {
-                                    fortune = fortune.substring(0, 67) + "...";
+                                    fortune += fortune.substring(0, 67) + "...";
                                 }
                                 
                                 byte[] fortuneAscii = fortune.getBytes("ASCII");
