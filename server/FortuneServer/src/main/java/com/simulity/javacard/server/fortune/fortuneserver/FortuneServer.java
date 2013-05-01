@@ -49,8 +49,8 @@ public class FortuneServer extends HttpServlet {
 
     public static void main(String[] args) {
         Map<String, String[]> hm = new HashMap<String, String[]>();
-        hm.put("fortuneRequest", new String[] {"0"});
-        hm.put("msisdn", new String[] {"353866018263"});
+        hm.put("fortuneRequest", new String[]{"0"});
+        hm.put("msisdn", new String[]{"353866018263"});
         doRequestLogic(hm);
     }
 
@@ -95,53 +95,53 @@ public class FortuneServer extends HttpServlet {
                     } catch (IOException ex) {
                         Logger.getLogger(FortuneServer.class.getName()).log(Level.WARNING, "IOException when attmpeting to process Fortune command.", ex);
                     }
-
+                    
                     if (fortune != null) {
                         if (0 != fortune.length()) {
-                            
+
                             ByteString bs = null;
-                            
+
                             try {
-                                
+
                                 // regex by alex to replace any patters of > 2 spaces with 1 space
                                 
                                 fortune = fortune.trim().replaceAll(" +", " ");
-                                
-                                if(fortune.length() > 70) {
-                                    fortune += fortune.substring(0, 67) + "...";
+
+                                if (fortune.length() > 70) {
+                                    fortune = fortune.substring(0, 67) + "...";
                                 }
-                                
+
                                 byte[] fortuneAscii = fortune.getBytes("ASCII");
                                 bs = new ByteString(fortuneAscii);
                             } catch (UnsupportedEncodingException ex) {
                                 Logger.getLogger(FortuneServer.class.getName()).log(Level.SEVERE, null, ex);
                                 doRequestLogic(requestParameters);
                             }
-                            
-                            
-                            if(bs == null) {
+
+
+                            if (bs == null) {
                                 doRequestLogic(requestParameters);
                             }
-                            
+
                             // transmit the fortune message to the handset
                             CardSettings cs = new CardSettings(
-                                    "0000", 
-                                    "NONE", 
-                                    "NONE", 
-                                    "1", 
-                                    "NONE", 
-                                    "NONE", 
-                                    "1", 
-                                    "555559", 
-                                    "0000000000", 
-                                    "0", 
-                                    "0", 
+                                    "0000",
+                                    "NONE",
+                                    "NONE",
+                                    "1",
+                                    "NONE",
+                                    "NONE",
+                                    "1",
+                                    "555559",
+                                    "0000000000",
+                                    "0",
+                                    "0",
                                     requestParameters.get("msisdn")[0]);
-                            
+
                             String transmit = "0A010000" + ((bs.toBytes().length < 0x0F) ? "0" + Integer.toHexString(bs.toBytes().length) : Integer.toHexString(bs.toBytes().length)) + bs.toHex();
-                            
+
                             Logger.getLogger(FortuneServer.class.getName()).log(Level.INFO, "Transmitting APDU: {0}", transmit);
-                            
+
                             if (SendSms.sendMessage(transmit, cs, "http://simulity.co.uk/ota/ram/command")) {
                                 Logger.getLogger(FortuneServer.class.getName()).log(Level.INFO, "The SMS {0} transmitted successfully.", fortune);
                             } else {

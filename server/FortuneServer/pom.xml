@@ -20,6 +20,12 @@
             <artifactId>servlet-util</artifactId>
             <version>1.0-SNAPSHOT</version>
             <type>jar</type>
+            <exclusions>
+                <exclusion>
+                    <artifactId>dbase</artifactId>
+                    <groupId>com.simulity</groupId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>com.simulity.api</groupId>
