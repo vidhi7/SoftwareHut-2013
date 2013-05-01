@@ -57,6 +57,8 @@ public class FortuneServer extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         doRequestLogic(req.getParameterMap());
+        resp.getWriter().write("OK");
+        resp.getWriter().flush();
     }
 
     private static void doRequestLogic(Map<String, String[]> requestParameters) {

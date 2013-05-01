@@ -205,7 +205,6 @@ public class FortuneApplet extends Applet implements ToolkitConstants, ToolkitIn
                         short payloadLength = (short) (apduBuffer[OFFSET_LC] & 0xFF);
                         ProactiveHandler theHandler = ProactiveHandler.getTheHandler();
                         theHandler.initDisplayText((byte) 0x81, DCS_8_BIT_DATA, apduBuffer, (short) 5, payloadLength);
-                        System.out.println(new String(apduBuffer));
                         if (theHandler.send() == RES_CMD_PERF) {
                             displayFortuneMenu();
                         }
