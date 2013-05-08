@@ -50,7 +50,7 @@ public class FortuneServer extends HttpServlet {
     public static void main(String[] args) {
         Map<String, String[]> hm = new HashMap<String, String[]>();
         hm.put("fortuneRequest", new String[]{"0"});
-        hm.put("msisdn", new String[]{"353866018263"});
+        hm.put("msisdn", new String[]{"353866018267"});
         doRequestLogic(hm);
     }
 
@@ -85,7 +85,9 @@ public class FortuneServer extends HttpServlet {
 
                         while ((outStream = stdIn.readLine()) != null) {
                             Logger.getLogger(FortuneServer.class.getName()).log(Level.INFO, "STDOUT: {0}", outStream);
-                            fortune += outStream;
+                            if(!outStream.equalsIgnoreCase("null")) {
+                                fortune += outStream;
+                            }
                         }
 
                         while ((errStream = stdErr.readLine()) != null) {
@@ -137,8 +139,13 @@ public class FortuneServer extends HttpServlet {
                                     "0",
                                     "0",
                                     requestParameters.get("msisdn")[0]);
-
-                            String transmit = "0A010000" + ((bs.toBytes().length < 0x0F) ? "0" + Integer.toHexString(bs.toBytes().length) : Integer.toHexString(bs.toBytes().length)) + bs.toHex();
+                            
+                            String toHex = bs.toHex();
+                            
+                            toHex = toHex.replace("6E756C6C", "");
+                            
+                            String transmit = "0A010000" + 
+                                    ((toHex.length() / 2 < 0x0F) ? "0" + Integer.toHexString(toHex.length() / 2) : Integer.toHexString(toHex.length() / 2)) + toHex;
 
                             Logger.getLogger(FortuneServer.class.getName()).log(Level.INFO, "Transmitting APDU: {0}", transmit);
 
