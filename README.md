@@ -1,7 +1,4 @@
 SoftwareHut-2013
 ================
 
-Private Repository for the Software Hut project at Bangor University. To be published upon completion of the project. This is also a great place to put any handy information about the project, or even keep a diary of development.
-
-<em>Netbeans has a couple of plugins that are great for Java Card development.<br>
-&nbsp;Find them in Tools >>Plugins>>Available Plugins</em>
+This project was completed by the 2013 SoftwareHut team at Bangor University. The students successfully created a JavaCard 2.2.1 Application which sent a message to a Java server which in turn requested a 'Fortune' message and sends the message using 03.48 OTA to the handset, which displays the message. 
