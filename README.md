@@ -12,6 +12,7 @@ Christopher Burke - Software Engineer - Simulity Labs Ltd
 
 * Andrei Alexandru Brasoveanu
 * Delvin Varghese
+* Dominic Lee
 
 ###Introduction: What is Fortune? 
 "fortune is a simple program that displays a pseudorandom message from a database of quotations that first appeared in Version 7 Unix. The most common version on modern systems is the BSD fortune, originally written by Ken Arnold. Distributions of fortune are usually bundled with a collection of themed files, containing sayings like those found on fortune cookies (hence the name), quotations from famous people, jokes, or poetry." *Source: [Wikipedia](http://en.wikipedia.org/wiki/Fortune_(Unix))*
