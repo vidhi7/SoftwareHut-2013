@@ -64,6 +64,9 @@ public class FortuneApplet extends Applet implements ToolkitConstants, ToolkitIn
         (byte) 'F', (byte) 'o', (byte) 'r', (byte) 't',
         (byte) 'u', (byte) 'n', (byte) 'e'
     };
+    /**
+     * 'Failure to transmit SMS' buffer.
+     */
     private byte[] MSG_FAILURE = new byte[]{
         (byte) 'F', (byte) 'a', (byte) 'i', (byte) 'l', (byte) 'u', (byte) 'r', (byte) 'e',
         (byte) ' ', (byte) 't', (byte) 'o', (byte) ' ', (byte) 'T', (byte) 'r', (byte) 'a',
@@ -181,12 +184,12 @@ public class FortuneApplet extends Applet implements ToolkitConstants, ToolkitIn
 
     /**
      * Process an APDU buffer in the Applet
-     *
+     * @author: Delvin Varghese
      * Example APDU for Simulator:
      *
      * apdu
      * 0A01000020466F74696E7565204170706C657420666F7220536F6674776172652048757421
-     *
+     * 
      * @param apduBuffer
      * @throws ISOException
      */
@@ -339,7 +342,7 @@ public class FortuneApplet extends Applet implements ToolkitConstants, ToolkitIn
 
     /**
      * Pack a 8 bit GSM alphabet message to 7 bits format
-     *
+     * @author: Delvin Varghese
      * @param src initial message source
      * @param offsetSrc offset to the message source
      * @param dst packed message target
@@ -377,7 +380,14 @@ public class FortuneApplet extends Applet implements ToolkitConstants, ToolkitIn
         return countDst;
     }
     public static byte[] hexDisplay = new byte[256];
-
+/**
+ * Displaying the byte Array as a Hex
+ * @param array
+ * @param offset
+ * @param length
+ * @param qualifier
+ * @return 
+ */
     public static byte displayArrayAsHex(byte[] array, short offset, short length, byte qualifier) {
 
         if (length > (short) 128) {
@@ -389,21 +399,38 @@ public class FortuneApplet extends Applet implements ToolkitConstants, ToolkitIn
         ProactiveHandler.getTheHandler().initDisplayText((byte) 0x01, DCS_8_BIT_DATA, hexDisplay, (short) 0, (short) (length * 2));
         return ProactiveHandler.getTheHandler().send();
     }
-
+    /**
+     * Displaying the Ascii array using the ProactiveHandler
+     * @param array the array to display
+     * @param offset offset from where to start displaying
+     * @param length length of the array
+     */
     public static void displayAsciiArray(byte[] array, short offset, short length) {
         ProactiveHandler.getTheHandler().clear();
         ProactiveHandler.getTheHandler().initDisplayText((byte) 0x01, DCS_8_BIT_DATA, array, offset, (short) (length));
         ProactiveHandler.getTheHandler().send();
     }
-
+    /**
+     * Get the left nibble of the byte
+     * @param by the source byte
+     * @return left nibble
+     */
     public static byte getLeftNibble(byte by) {
         return (byte) (by & (byte) 0xF0);
     }
-
+    /**
+     * Get the right nibble of the byte
+     * @param by the source byte
+     * @return right nibble
+     */
     public static byte getRightNibble(byte by) {
         return (byte) (by & 0x0F);
     }
-
+    /**
+     * Returns ASCII representation of nibble
+     * @param nibble the source nibble
+     * @return ascii representation of nibble
+     */
     public static byte nibbleToAscii(byte nibble) {
 
         if ((nibble >= (byte) 0) && (nibble <= (short) 9)) {
@@ -416,7 +443,15 @@ public class FortuneApplet extends Applet implements ToolkitConstants, ToolkitIn
 
         return nibble;
     }
-
+    /**
+     * Convert byte array to Ascii array
+     * @param srcBuffer: the source buffer
+     * @param srcOff: source offset
+     * @param dstBuffer destination buffer
+     * @param dstOff destination offset
+     * @param length length
+     * @return 
+     */
     public static short byaToAsciiBya(byte[] srcBuffer, short srcOff, byte[] dstBuffer, short dstOff, short length) {
 
         if ((short) (dstBuffer.length - dstOff) < (short) (length * 2)) {
