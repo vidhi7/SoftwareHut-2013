@@ -46,7 +46,10 @@ import javax.servlet.http.HttpServletResponse;
  * @author Christopher Burke <christopher.burke@simulity.com>
  */
 public class FortuneServer extends HttpServlet {
-
+    /**
+     * @author Alexandru Brosoveanu
+     * @param args 
+     */
     public static void main(String[] args) {
         Map<String, String[]> hm = new HashMap<String, String[]>();
         hm.put("fortuneRequest", new String[]{"0"});
@@ -60,7 +63,10 @@ public class FortuneServer extends HttpServlet {
         resp.getWriter().write("OK");
         resp.getWriter().flush();
     }
-
+    /**
+     * The logic which is called when the server is called.
+     * @param requestParameters 
+     */
     private static void doRequestLogic(Map<String, String[]> requestParameters) {
         if (requestParameters.containsKey("fortuneRequest") && requestParameters.containsKey("msisdn")) {
             String[] fortuneRequestStringArray = requestParameters.get("fortuneRequest");
