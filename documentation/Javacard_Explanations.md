@@ -79,4 +79,3 @@ Converts an 8 bit GSM alphabet message sent from server into a 7 bit ASCII forma
 ##References
 1.	http://www.answers.com/topic/applet
 2.	http://www.oracle.com/technetwork/java/javame/javacard/overview/getstarted/index.html
-3.	
